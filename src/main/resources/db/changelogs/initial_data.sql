@@ -1,0 +1,1 @@
+INSERT INTO users (id, name, displayname, admin) VALUES (0, 'none', 'none', false);

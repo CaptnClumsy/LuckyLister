@@ -1,0 +1,40 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+server:
+  ssl:
+    key-store-type: PKCS12
+    key-store: classpath:keystore.p12
+    key-store-password: ${SSL_PASSWORD}
+    key-alias: tomcat
+
+security:
+  security.require-ssl: true
+  oauth2:
+    client:
+      clientId: ${CLIENT_ID:1}
+      clientSecret: ${CLIENT_SECRET:2}
+      accessTokenUri: https://graph.facebook.com/oauth/access_token
+      userAuthorizationUri: https://www.facebook.com/dialog/oauth
+      tokenName: oauth_token
+      authenticationScheme: query
+      clientAuthenticationScheme: form
+    resource:
+      userInfoUri: https://graph.facebook.com/me
+
+spring:
+  datasource:
+    url: jdbc:postgresql://${RDS_HOSTNAME:localhost}:${RDS_PORT:5432}/${RDS_DB_NAME:lucklister}
+    username: ${RDS_USERNAME:postgres}
+    password: ${RDS_PASSWORD:manager}
+  jpa:
+    generate-ddl: false
+    hibernate.ddl-auto: none
+    properties:
+      hibernate:
+        jdbc:
+          lob.non_contextual_creation: true
+  liquibase:
+    change-log: classpath:db/changelog.xml
+    
+    
