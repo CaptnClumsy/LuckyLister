@@ -12,4 +12,7 @@ import com.clumsy.luckylister.entities.UserLuckyPokemonEntity;
 public interface UserLuckyPokemonRepo extends JpaRepository<UserLuckyPokemonEntity, Long> {
 	@Query("SELECT t.pokemonid FROM UserLuckyPokemonEntity t WHERE t.userid = ?1")
 	Set<Long> findByUserId(Long id);
+
+	@Query("SELECT t FROM UserLuckyPokemonEntity t WHERE t.userid = ?1 AND t.pokemonid = ?2")
+	UserLuckyPokemonEntity findByUserIdAndPokemonId(Long id, Long pokemonId);
 }

@@ -44,6 +44,7 @@
     margin: .25rem .5rem;
     border: none;
     background: transparent;
+    align-self: baseline;
 }
 .lucky-cell-tick {
 	position: absolute;
@@ -58,9 +59,23 @@
     display: inline-block;
     white-space: nowrap;
 }
+.lucky-img-outline {
+  -webkit-filter: grayscale(100%) brightness(0);
+  filter: grayscale(100%) brightness(0);
+  opacity: 0.6;
+}
 .lucky-need {
 	color: grey;
 }
 .lucky-got {
 	color: green;
+}
+.lucky-grid-header {
+	display: flex;
+    justify-content: space-between;
+}
+.lucky-button-group {
+	margin-right: 20px;
+	margin-left: 10px;
+	align-self: center;
 }

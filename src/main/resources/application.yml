@@ -24,7 +24,7 @@ security:
 
 spring:
   datasource:
-    url: jdbc:postgresql://${RDS_HOSTNAME:localhost}:${RDS_PORT:5432}/${RDS_DB_NAME:lucklister}
+    url: jdbc:postgresql://${RDS_HOSTNAME:localhost}:${RDS_PORT:5432}/${RDS_DB_NAME:luckylister}
     username: ${RDS_USERNAME:postgres}
     password: ${RDS_PASSWORD:manager}
   jpa:
