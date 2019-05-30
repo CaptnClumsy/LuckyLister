@@ -1,3 +1,10 @@
+body {
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
 .lucky-navbar-title {
     font-size: 24px;
     font-weight: bold;
@@ -22,15 +29,12 @@
 	display: flex;
     flex-wrap: wrap;
     text-align: center;
-    position:absolute;
-    top: 100px;
-    left:0px;
-    right:0px;
-    bottom:0px;
-    overflow-y:scroll;
+    align-content: baseline;
+    height: calc(100vh - 130px);
+    overflow-y: scroll;
 }
 .lucky-searchbox {
-	margin-left: 30px;
+	margin-left: 4px;
 	margin-top: 4px;
 	margin-bottom: 4px;
 	padding-left: 10px;
@@ -41,21 +45,21 @@
 .lucky-cell {
 	position: relative;
     flex: 0 0 14.2857143%;
-    margin: .25rem .5rem;
     border: none;
+    padding: 0px;
     background: transparent;
     align-self: baseline;
 }
 .lucky-cell-tick {
 	position: absolute;
-    left: 30px;
+    left: 10px;
     font-size: small;
     width: 1.5rem;
 }
 .lucky-cell-label {
-	padding: 0 .4rem .2rem;
+	font-size: 14px;
     font-weight: 700;
-    width: 8rem;
+    width: 100px;
     display: inline-block;
     white-space: nowrap;
 }
@@ -75,7 +79,11 @@
     justify-content: space-between;
 }
 .lucky-button-group {
-	margin-right: 20px;
+	margin-right: 10px;
 	margin-left: 10px;
 	align-self: center;
+}
+.lucky-small-button {
+	padding: 6px;
+	font-size: 11px;
 }

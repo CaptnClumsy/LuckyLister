@@ -75,8 +75,10 @@ function getCellHtml(data) {
   if (data.done===true) {
 	labelClass = "lucky-got";
 	str += "<img class=\"lucky-cell-tick\" src=\"images/tickmark.png\"></img>";
-  }    
-  str += "<img src=\"" + data.url + "\" ";
+  }
+  var image_url = getImageUrl(data);
+  str += "<img src=\"" + image_url + "\" ";
+  str += "width=\"" + getImageSize() + "\" "
   if (data.done!==true) {
 	  str += " class=\"lucky-img-outline\"";
   }
@@ -84,6 +86,32 @@ function getCellHtml(data) {
     "<span class=\"lucky-cell-label " + labelClass + "\">" + data.name + "<\span>" +
 	"</button>\n";
   return str;
+}
+
+function getImageUrl(data) {
+  var iconId = "";
+  if (data.dexid<10) {
+    iconId = "00" + data.dexid;
+  } else if (data.dexid<100) {
+    iconId = "0" + data.dexid;
+  } else {
+    iconId = data.dexid;
+  }
+  image_url = "images/" + 
+	"pokemon_icon_" + iconId + "_00.png";
+  return image_url;
+}
+
+function getImageSize() {
+  var divsize = $("#pokemon").width();
+  var imgsize = Math.round(divsize / 8);
+  if (imgsize > 150) {
+	imgsize = 150;
+  }
+  if (imgsize<10) {
+	imgsize = 10;
+  }
+  return imgsize;
 }
 
 function logout() {

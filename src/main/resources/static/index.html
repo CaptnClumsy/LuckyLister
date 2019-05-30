@@ -5,9 +5,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <title>LuckyLister</title>
     <meta name="description" content=""/>
-    <meta name="viewport" content="width=device-width"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no"/>
     <base href="/"/>
  
+    <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css" />
     <link rel="stylesheet" type="text/css" href="/webjars/bootstrap/css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="/css/luckylister.css"/>
  
@@ -59,13 +60,13 @@
         <div class="lucky-grid-header">
           <input type="text" id="lucky-searchbox" class="form-control lucky-searchbox" onkeyup="searchPokemon()" placeholder="Search by name..">
           <div id="lucky-filter-group" class="btn-group btn-group-toggle lucky-button-group" data-toggle="buttons">
-            <label class="btn btn-info active">
+            <label class="btn btn-info lucky-small-button active">
               <input type="radio" name="options" id="lucky-filter-all" autocomplete="off" value="ALL" checked>All
             </label>
-            <label class="btn btn-info">
+            <label class="btn btn-info lucky-small-button">
               <input type="radio" name="options" id="luck-filter-need" autocomplete="off" value="NEED">Need
             </label>
-            <label class="btn btn-info">
+            <label class="btn btn-info lucky-small-button">
               <input type="radio" name="options" id="lucky-filter-got" autocomplete="off" value="GOT">Got
             </label>
           </div>

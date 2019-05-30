@@ -20,10 +20,6 @@ import com.clumsy.luckylister.repos.UserLuckyPokemonRepo;
 @Service
 public class PokemonService {
 
-	private static final String IMAGE_SERVER_URL = "//images.weserv.nl/";
-	private static final String GITHUB_ASSET_URL = "raw.githubusercontent.com/ZeChrales/PogoAssets/master/pokemon_icons/";
-	private static final int IMAGE_WIDTH=70;
-
 	private final PokemonRepo pokemonRepo;
 	private final UserLuckyPokemonRepo luckyPokemonRepo;
 	
@@ -31,24 +27,6 @@ public class PokemonService {
 	PokemonService(final PokemonRepo pokemonRepo, final UserLuckyPokemonRepo luckyPokemonRepo) {
 		this.pokemonRepo = pokemonRepo;
 		this.luckyPokemonRepo = luckyPokemonRepo;
-	}
-	
-	private String getPokemonImageUrl(Long dexId, boolean done) {
-		String iconId = "";
-		if (dexId<10) {
-			iconId = "00" + dexId;
-		} else if (dexId<100) {
-			iconId = "0" + dexId;
-		} else {
-			iconId = dexId.toString();
-		}
-		String url = IMAGE_SERVER_URL + "?w="+ IMAGE_WIDTH;
-		if (!done) {
-			url += "&filt=greyscale";
-		}
-		url += "&il&url=" + GITHUB_ASSET_URL + 
-			"pokemon_icon_" + iconId + "_00.png";
-		return url;
 	}
 
 	@Transactional(readOnly = true)
@@ -59,10 +37,8 @@ public class PokemonService {
 		for (PokemonEntity entity : entities) {
 			final PokemonDao dao = PokemonDao.fromEntity(entity);
 			if (luckyPokemonIds.contains(dao.getId())) {
-				dao.setUrl(getPokemonImageUrl(entity.getDexid(), true));
 				dao.setDone(true);
 			} else {
-				dao.setUrl(getPokemonImageUrl(entity.getDexid(), false));
 				dao.setDone(false);
 			}
 			daos.add(dao);
@@ -81,8 +57,6 @@ public class PokemonService {
 		final PokemonDao dao = PokemonDao.fromEntity(pokemonEntity.get());
 		
 		if (!selected) {
-			// update the image etc
-			dao.setUrl(getPokemonImageUrl(pokemonEntity.get().getDexid(), false));
 			dao.setDone(false);
 			// delete the row
 			if (entity!=null) {
@@ -92,7 +66,6 @@ public class PokemonService {
 		} 
 
 		// check if already selected
-		dao.setUrl(getPokemonImageUrl(pokemonEntity.get().getDexid(), true));
 		dao.setDone(true);
 		if (entity!=null) {    
 	        return dao;

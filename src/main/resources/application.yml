@@ -3,10 +3,10 @@ server:
 
 server:
   ssl:
-    key-store-type: PKCS12
-    key-store: classpath:keystore.p12
+    key-store-type: ${SSL_KEYSTORE_TYPE:PKCS12}
+    key-store: ${SSL_KEYSTORE:classpath:keystore.p12}
     key-store-password: ${SSL_PASSWORD}
-    key-alias: tomcat
+    key-alias: ${SSL_KEY_ALIAS:tomcat}
 
 security:
   security.require-ssl: true
