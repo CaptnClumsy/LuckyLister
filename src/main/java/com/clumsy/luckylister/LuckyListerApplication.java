@@ -20,7 +20,7 @@ public class LuckyListerApplication extends WebSecurityConfigurerAdapter {
 	    http
 	      .antMatcher("/**")
 	      .authorizeRequests()
-	        .antMatchers("/", "/login**", "/webjars/**", 
+	        .antMatchers("/", "/tos**", "/login**", "/webjars/**", 
 	        	"/error**", "/images/**", "/js/**", "/css/**")
 	        .permitAll()
 	      .anyRequest()
