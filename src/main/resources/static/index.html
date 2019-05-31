@@ -3,9 +3,16 @@
 <head>
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <title>LuckyLister</title>
-    <meta name="description" content=""/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no"/>
+
+    <title>LuckyLister</title>
+    
+    <meta property="og:type" content="website" />
+    <meta property="og:title" th:content="LuckyLister" />
+    <meta property="og:url" th:content="https://www.lucklister.com" />
+    <meta property="og:description" th:content="Track your lucky Pokemon and see what Pokemon other trainers need. Compare your luckydex progress with other trainers and have fun trading!" />
+    <meta property="fb:app_id" content="882289415445644" />
+
     <base href="/"/>
  
     <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css" />
@@ -17,6 +24,7 @@
     <script type="text/javascript" src="/webjars/bootstrap/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="/webjars/js-cookie/js.cookie.js"></script>
     <script type="text/javascript" src="js/select2.full.min.js"></script>
+    <script type="text/javascript" src="/js/luckylister-percentage.js"></script>
     <script type="text/javascript" src="/js/luckylister.js"></script>
 
 </head>
@@ -27,6 +35,9 @@
         <img src="/images/clover.png" width="30" height="30" class="d-inline-block align-text-bottom" alt="">
         LuckyLister
       </a>
+      <span class="authenticated lucky-nav-percent" style="display: none;">
+        <span id="lucky-gold-percent" class="lucky-navbar-label lucky-percent lucky-percent-small"></span>
+      </span>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button> 

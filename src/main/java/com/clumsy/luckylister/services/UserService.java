@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.clumsy.luckylister.data.TotalDao;
 import com.clumsy.luckylister.entities.UserEntity;
 import com.clumsy.luckylister.exceptions.UserNotFoundException;
 import com.clumsy.luckylister.repos.UserRepo;
@@ -77,6 +78,13 @@ public class UserService {
 			throw new UserNotFoundException("User not found");
 	    }
 		return user;
+	}
+
+	@Transactional(readOnly = true)
+	public TotalDao getStats(UserEntity user) {
+		Long total = userRepo.findTotal();
+		Long amount = userRepo.findLucky(user.getId());
+		return new TotalDao(total, amount);
 	}
 
 }

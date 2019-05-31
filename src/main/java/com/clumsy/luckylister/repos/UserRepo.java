@@ -15,4 +15,9 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
 	@Query("SELECT t FROM UserEntity t WHERE t.id != 0 ORDER BY t.displayName ASC")
 	List<UserEntity> findAll();
 	
+	@Query("SELECT COUNT(*) FROM PokemonEntity")
+	Long findTotal();
+	
+	@Query("SELECT COUNT(*) FROM UserLuckyPokemonEntity t WHERE t.userid=?1")
+	Long findLucky(Long userid);
 }

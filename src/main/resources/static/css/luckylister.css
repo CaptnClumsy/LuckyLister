@@ -36,6 +36,38 @@ body {
 	border-color: white;
     width: 30px;
 }
+.lucky-nav-percent {
+    height: 56px;
+    width: 50px;
+}
+.lucky-percent {
+    position:relative;
+}
+.lucky-percent canvas {
+    display: block;
+    position:absolute;
+    top:0;
+    left:0;
+}
+.lucky-percent-small {
+	width:42px;
+	height:42px;
+	top: 20px;
+    color: white;
+}
+.lucky-percentage-text {
+    display:block;
+    text-align:center;
+    font-weight: bold;
+    position:absolute;
+    top:0;
+    left:0;
+}
+.lucky-percentage-details {
+	position: absolute;
+	text-align: center;
+	font-size: 10px;
+}
 .lucky-container {
 	width: 100%;
     min-width: 100%;

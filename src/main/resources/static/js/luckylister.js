@@ -110,6 +110,7 @@ function showHome() {
       str += "</button>\n";
     }
     $("#pokemon").html(str);
+    resetPercentage();
   });
 }
 
@@ -128,8 +129,10 @@ function selectPokemon(id) {
 	data: JSON.stringify(data),
 	success: function (data) {
 	  // Update the UI
+	  var width = getImageSize("#pokemon");
 	  $(element).html("");
-      $(element).html(getCellHtml(data));
+      $(element).html(getCellHtml(data, width));
+      resetPercentage();
       searchPokemon();
 	},
 	error: function (result) {
@@ -249,6 +252,31 @@ function filterPokemon(filter) {
 	  }
 	}
   }
+}
+
+function resetPercentage() {
+  $.get("/user/stats", function(data) {
+	  var colors = getPercentageColors();
+	  // Clear previous percentage
+	  $('#lucky-gold-percent').html('');
+	  // Draw the new percentage
+	  var el = document.getElementById('lucky-gold-percent');
+	  drawPercentage(el, 42, 5, data.amount, data.total, colors.background, colors.gold, true, false);
+  });
+}
+
+function getPercentageColors() {
+  var backColor = '#efefef';
+  var goldColor = '#f0f000';
+  var retData = {
+	background: backColor,
+    gold: goldColor
+  };
+  return retData;
+}
+
+function getPercentDone() {
+	
 }
 
 function errorPage(title, results) {

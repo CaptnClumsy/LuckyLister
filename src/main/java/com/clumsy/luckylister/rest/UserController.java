@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.clumsy.luckylister.data.SelectListDao;
+import com.clumsy.luckylister.data.TotalDao;
 import com.clumsy.luckylister.data.UserDao;
 import com.clumsy.luckylister.entities.UserEntity;
 import com.clumsy.luckylister.exceptions.NotLoggedInException;
@@ -47,6 +48,20 @@ public class UserController {
 			return userDaos;
 		} catch (UserNotFoundException e) {
 			throw new ObjectNotFoundException("No users found");
+		}
+    }
+	
+	@RequestMapping("/user/stats")
+	public TotalDao stats(Principal principal) {
+		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+		try {
+			UserEntity user = userService.getCurrentUser(principal);
+			TotalDao stats = userService.getStats(user);
+			return stats;
+		} catch (UserNotFoundException e) {
+			throw new ObjectNotFoundException("Current user not found");
 		}
     }
 }
