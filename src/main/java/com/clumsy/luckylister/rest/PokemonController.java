@@ -59,4 +59,18 @@ public class PokemonController {
 			throw new ObjectNotFoundException("Current user not found");
 		}
     }
+	
+	@RequestMapping("/pokemon/user/{id}")
+	public List<PokemonDao> listPokemonForUser(@PathVariable("id") Long userId, Principal principal) {
+		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+		try {
+			UserEntity user = userService.getUser(userId);
+			List<PokemonDao> pokemon = pokemonService.listPokemonForUser(user);
+			return pokemon;
+		} catch (UserNotFoundException e) {
+			throw new ObjectNotFoundException("User not found");
+		}
+    }
 }

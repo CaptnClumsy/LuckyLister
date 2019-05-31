@@ -5,6 +5,18 @@ body {
     left: 0;
     width: 100%;
 }
+@font-face {
+  font-family: 'FontAwesome';
+  src: url('fontawesome-webfont.eot');
+  src: url('fontawesome-webfont.eot?#iefix') format('embedded-opentype'),
+       url('fontawesome-webfont.woff2') format('woff2'),
+       url('fontawesome-webfont.woff') format('woff'),
+       url('fontawesome-webfont.ttf') format('truetype'),
+       url('fontawesome-webfont.svg#fontawesomeregular') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
 .lucky-navbar-title {
     font-size: 24px;
     font-weight: bold;
@@ -13,6 +25,16 @@ body {
 }
 .lucky-navbar-right {
 	justify-content: flex-end;
+}
+.lucky-nav-group {
+	align-self: center;
+}
+.lucky-nav-button {
+	padding: 6px;
+	font-size: 20px;
+	color: white;
+	border-color: white;
+    width: 30px;
 }
 .lucky-container {
 	width: 100%;
@@ -86,4 +108,12 @@ body {
 .lucky-small-button {
 	padding: 6px;
 	font-size: 11px;
+}
+.lucky-small-alert {
+	font-size: 12px;
+	padding: 4px;
+	margin: 4px;
+}
+.lucky-user-search {
+	margin: 4px;
 }

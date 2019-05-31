@@ -12,6 +12,7 @@ function initPage() {
       }
     }
   });
+  initNavbar();
   $.ajax({
 	type: "GET",
     contentType: "application/json; charset=utf-8",
@@ -20,23 +21,92 @@ function initPage() {
 	  $("#user").html(data.displayName);
 	  $(".unauthenticated").hide();
 	  $(".authenticated").show();
-	  showPokemon();
+	  initHome();
+	  initUser();
+	  initPokemon();
+	  showHome();
 	}
   });
 }
 
-function showPokemon() {
-  $('#lucky-filter-group .btn').on('click', function(event) {
+function initNavbar() {
+  $('#lucky-nav-group .btn').on('click', function(event) {
     var val = $(this).find('input').val();
+	showView(val);
+  });
+}
+
+function showView(view) {
+	if (view==="HOME") {
+		$("#lucky-pokemon-page").hide();
+		$("#lucky-user-page").hide();
+		$("#lucky-home-page").show();
+	} else if (view==="USER") {
+		$("#lucky-home-page").hide();
+		$("#lucky-pokemon-page").hide();
+		$("#lucky-user-page").show();
+	} else if (view==="POKEMON") {
+		$("#lucky-home-page").hide();
+		$("#lucky-user-page").hide();
+		$("#lucky-pokemon-page").show();
+	}
+}
+
+function initHome() {
+  $('#lucky-filter-group .btn').on('click', function(event) {
+	var val = $(this).find('input').val();
     filterPokemon(val);
   });
+}
+
+function initUser() {
+  $.ajax({
+    type: "GET",
+    contentType: "application/json; charset=utf-8",
+    url: "/user/all",
+    success: function (data) {
+      $('#user-search').select2({
+        placeholder: "Select a trainer",
+        width: '90%',
+        data: data
+      });
+      $('#user-search').on("select2:select", function(e) {
+    	  $("#user-pokemon-header").show();
+    	  $("#user-pokemon").show();
+    	  showUserPokemon(e.params.data.id);
+      });
+    },
+    error: function (result) {
+      errorPage("Failed to query user data", result);
+    }
+  });
+}
+
+function showUserPokemon(id) {
+  $.get("/pokemon/user/"+id, function(data) {
+	var width = getImageSize("#user-pokemon");
+    $("#user-pokemon").html("");
+	var str = "";
+	for (var i=0; i<data.length; i++) {
+	  str += "<button id=\"user-pokemon-" + data[i].id + "\" class=\"lucky-cell\">";
+	  str += getCellHtml(data[i], width);
+	  str += "</button>\n";
+	}
+	$("#user-pokemon").html(str);
+  });
+}
+
+function initPokemon() {
+}
+
+function showHome() {
   $.get("/pokemon", function(data) {
+	var width = getImageSize("#pokemon");
     $("#pokemon").html("");
     var str = "";
     for (var i=0; i<data.length; i++) {
-      var labelClass = "lucky-need";
       str += "<button id=\"pokemon-" + data[i].id + "\" class=\"lucky-cell\" onclick=\"selectPokemon(" + data[i].id + ")\">";
-      str += getCellHtml(data[i]);
+      str += getCellHtml(data[i], width);
       str += "</button>\n";
     }
     $("#pokemon").html(str);
@@ -68,7 +138,7 @@ function selectPokemon(id) {
   });
 }
 
-function getCellHtml(data) {
+function getCellHtml(data, width) {
   var str = "";
   var labelClass = "lucky-need";
   var imgClass = "";
@@ -78,7 +148,7 @@ function getCellHtml(data) {
   }
   var image_url = getImageUrl(data);
   str += "<img src=\"" + image_url + "\" ";
-  str += "width=\"" + getImageSize() + "\" "
+  str += "width=\"" + width + "\" "
   if (data.done!==true) {
 	  str += " class=\"lucky-img-outline\"";
   }
@@ -102,8 +172,8 @@ function getImageUrl(data) {
   return image_url;
 }
 
-function getImageSize() {
-  var divsize = $("#pokemon").width();
+function getImageSize(grid) {
+  var divsize = $(grid).width();
   var imgsize = Math.round(divsize / 8);
   if (imgsize > 150) {
 	imgsize = 150;
@@ -123,6 +193,28 @@ function logout() {
   return true;
 }
 
+function searchUserPokemon() {
+  // Declare variables
+  var input, filterText, grid, cells, label, i, txtValue;
+  input = document.getElementById("lucky-user-searchbox");
+  filterText = input.value.toUpperCase();
+  grid = document.getElementById("user-pokemon");
+  cells = grid.getElementsByClassName("lucky-cell");
+		  
+  // Loop through all grid rows, and hide those who don't match the search query
+  for (i = 0; i < cells.length; i++) {
+    label = cells[i].getElementsByClassName("lucky-cell-label")[0];
+	if (label) {
+	  txtValue = label.textContent || label.innerText;
+	  if (txtValue.toUpperCase().indexOf(filterText) > -1) {
+	    cells[i].style.display = "";
+	  } else {
+		cells[i].style.display = "none";
+	  }
+	}
+  }
+}
+
 function searchPokemon() {
   // Find which radio button is selected
   var filter = $('#lucky-filter-group input:radio:checked').val()
@@ -131,7 +223,7 @@ function searchPokemon() {
 
 function filterPokemon(filter) {
   // Declare variables
-  var input, filter, grid, cells, label, i, txtValue;
+  var input, filterText, grid, cells, label, i, txtValue;
   input = document.getElementById("lucky-searchbox");
   filterText = input.value.toUpperCase();
   grid = document.getElementById("pokemon");

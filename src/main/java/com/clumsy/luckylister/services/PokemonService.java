@@ -46,6 +46,18 @@ public class PokemonService {
 		return daos;
 	}
 
+	@Transactional(readOnly = true)
+	public List<PokemonDao> listPokemonForUser(UserEntity user) {
+		final List<PokemonEntity> entities = pokemonRepo.findAllForUser(user.getId());
+		List<PokemonDao> daos = new ArrayList<>(entities.size());
+		for (PokemonEntity entity : entities) {
+			final PokemonDao dao = PokemonDao.fromEntity(entity);
+			dao.setDone(false);
+			daos.add(dao);
+		}
+		return daos;
+	}
+
 	@Transactional
 	public PokemonDao updatePokemon(UserEntity user, Long pokemonId, boolean selected) throws ObjectNotFoundException {
 		// find if user already selected this pokemon and load the details for it		

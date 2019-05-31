@@ -2,6 +2,7 @@ package com.clumsy.luckylister.services;
 
 import java.security.Principal;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +58,24 @@ public class UserService {
 			UserEntity savedUser = userRepo.save(newUser);
 			return savedUser;
 		}
+		return user;
+	}
+
+	@Transactional(readOnly = true)
+	public List<UserEntity> getAllUsers() throws UserNotFoundException {
+		List<UserEntity> users = userRepo.findAll();
+		if (users == null) {
+			throw new UserNotFoundException("No users found");
+		}
+		return users;
+	}
+
+	@Transactional(readOnly = true)
+	public UserEntity getUser(Long userId) throws UserNotFoundException {
+		UserEntity user = userRepo.getOne(userId);
+		if (user == null) {
+			throw new UserNotFoundException("User not found");
+	    }
 		return user;
 	}
 

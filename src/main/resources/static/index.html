@@ -10,11 +10,13 @@
  
     <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css" />
     <link rel="stylesheet" type="text/css" href="/webjars/bootstrap/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="css/select2.min.css"/>
     <link rel="stylesheet" type="text/css" href="/css/luckylister.css"/>
- 
+
     <script type="text/javascript" src="/webjars/jquery/jquery.min.js"></script>
     <script type="text/javascript" src="/webjars/bootstrap/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="/webjars/js-cookie/js.cookie.js"></script>
+    <script type="text/javascript" src="js/select2.full.min.js"></script>
     <script type="text/javascript" src="/js/luckylister.js"></script>
 
 </head>
@@ -28,12 +30,30 @@
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button> 
-      <div class="collapse navbar-collapse lucky-navbar-right" id="navbarNav">
+      
+      <div id="navbarNav" class="navbar-collapse collapse">
+       <ul class="navbar-nav mr-auto">
+         <li class="nav-item">
+           <div id="lucky-nav-group" class="btn-group btn-group-toggle lucky-nav-group authenticated" data-toggle="buttons" style="display:none;">
+             <label class="btn btn-primary lucky-nav-button active">
+               <input type="radio" name="options" id="lucky-nav-home" autocomplete="off" value="HOME" checked>
+               <i class="fa fa-home"></i>
+             </label>
+             <label class="btn btn-primary lucky-nav-button">
+               <input type="radio" name="options" id="luck-nav-user" autocomplete="off" value="USER">
+               <i class="fa fa-user"></i>
+             </label>
+             <label class="btn btn-primary lucky-nav-button">
+               <input type="radio" name="options" id="lucky-nav-mon" autocomplete="off" value="POKEMON">
+               <i class="fa fa-question"></i>
+             </label>
+           </div>
+         </li>
+        </ul>
         <ul class="navbar-nav">
           <li class="nav-item unauthenticated">
             <a class="nav-link" href="/login/facebook">Login</a>
           </li>
-          
           <li class="nav-item dropdown authenticated" style="display:none">
             <a class="nav-link dropdown-toggle" href="#" id="user" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             </a>
@@ -41,8 +61,7 @@
               <button class="dropdown-item" onClick="logout()">Logout</button>
             </div>
           </li>
-          
-         </ul>
+        </ul>
       </div>
     </nav>
 
@@ -56,7 +75,7 @@
         </div>
       </div>
       
-      <div id="lucky-pokemon-page" class="authenticated" style="display:none">
+      <div id="lucky-home-page" class="authenticated" style="display:none">
         <div class="lucky-grid-header">
           <input type="text" id="lucky-searchbox" class="form-control lucky-searchbox" onkeyup="searchPokemon()" placeholder="Search by name..">
           <div id="lucky-filter-group" class="btn-group btn-group-toggle lucky-button-group" data-toggle="buttons">
@@ -73,6 +92,26 @@
         </div>
         <div class="lucky-grid" id="pokemon">
         </div>
+      </div>
+    </div>
+    
+    <div id="lucky-user-page" class="authenticated" style="display:none">
+      <div>
+        <div class="alert alert-info lucky-small-alert" role="alert">
+          Select the trainer you want to trade with to see what Pokemon they need.
+        </div>
+        <div class="lucky-user-search"><select id="user-search" name="user-search" class="form-control"><option></option></select></div>
+      </div>
+      <div class="lucky-grid-header" id="user-pokemon-header" style="display: none;">
+        <input type="text" id="lucky-user-searchbox" class="form-control lucky-searchbox" onkeyup="searchUserPokemon()" placeholder="Search by pokemon name..">
+      </div>
+      <div class="lucky-grid" id="user-pokemon" style="display: none;">
+      </div>
+    </div>
+
+    <div id="lucky-pokemon-page" class="authenticated" style="display:none">
+      <div class="jumbotron">
+          <h1 class="display-4">Coming Soon...</h1>
       </div>
     </div>
     
