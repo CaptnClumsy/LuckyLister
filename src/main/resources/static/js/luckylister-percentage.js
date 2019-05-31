@@ -23,7 +23,7 @@ function drawPercentage(parentElement, size, lineWidth, amount, total, bgColour,
 		// Add the details of the amount verses total
 		var detailsSpan = document.createElement('span');
 		detailsSpan.style.width = ""+size+"px";
-		detailsSpan.style.top = ""+(size-4)+"px";
+		detailsSpan.style.top = ""+size+"px";
 		detailsSpan.className = "lucky-percentage-details";
 		detailsSpan.innerHTML = "" + amount + "/" + total;
 		parentElement.appendChild(detailsSpan);

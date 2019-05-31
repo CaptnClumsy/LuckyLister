@@ -1,3 +1,5 @@
+var leadersTable = null;
+
 function initPage() {
   $.ajaxSetup({
     beforeSend : function(xhr, settings) {
@@ -40,15 +42,24 @@ function showView(view) {
 	if (view==="HOME") {
 		$("#lucky-pokemon-page").hide();
 		$("#lucky-user-page").hide();
+		$("#lucky-leader-page").hide();
 		$("#lucky-home-page").show();
 	} else if (view==="USER") {
 		$("#lucky-home-page").hide();
 		$("#lucky-pokemon-page").hide();
+		$("#lucky-leader-page").hide();
 		$("#lucky-user-page").show();
 	} else if (view==="POKEMON") {
 		$("#lucky-home-page").hide();
 		$("#lucky-user-page").hide();
+		$("#lucky-leader-page").hide();
 		$("#lucky-pokemon-page").show();
+	} else if (view==="LEADER") {
+		$("#lucky-home-page").hide();
+		$("#lucky-user-page").hide();
+		$("#lucky-pokemon-page").hide();
+		$("#lucky-leader-page").show();
+		showLeaderboard();
 	}
 }
 
@@ -275,8 +286,84 @@ function getPercentageColors() {
   return retData;
 }
 
-function getPercentDone() {
-	
+function showLeaderboard() {
+  $('#leadersTableBody').html("Loading...");
+  $.ajax({
+    type: "GET",
+    contentType: "application/json; charset=utf-8",
+    url: "/user/leaderboard",
+    success: function (data) {
+      resetLeadersTable();
+      $('#leadersTableBody').html("");
+      if (data == null || data.length==0) {
+        $('#leadersTableBody').append("<tr><td><div class=\"alert alert-warning\" role=\"alert\">No leaderboard to display.</div></td></tr>");
+      } else {
+        for (var i = 0; i < data.length; i++) {
+      	  var rankClass = getRankClass(data[i].rank);
+      	  $('#leadersTableBody').append("<tr>" +
+      	    "<td class=\"" + rankClass + "\">" + getRankHtml(data[i].rank) + "</td>" +
+      	    "<td class=\"" + rankClass + "\">"  + data[i].name + "</td>" +
+      	    "<td class=\"" + rankClass + " lucky-lead-total\">"  + data[i].total + "</td>");
+      	  }
+      	  // Initialize the table
+          leadersTable = $('#leadersTable').DataTable({
+            "autoWidth": true,
+          	"scrollY": 300,
+          	"scrollX": true,
+          	"searching": false,
+          	"lengthChange": false
+          });
+        }
+     },
+     error: function (result) {
+       resetLeadersTable();
+       $('#leadersTableBody').html("");
+       var errorHtml = "<tr><td><div class=\"alert alert-danger\" role=\"alert\">Failed to query leaderboard.";
+       if (result.responseJSON !== undefined) {
+         errorHtml += "<br>" + result.responseJSON.message;
+       }
+       errorHtml += "</div></td></tr>";
+       $('#leadersTableBody').append(errorHtml);
+     },
+     complete: function() {
+       if (leadersTable != null) {
+         leadersTable.columns.adjust().draw();
+       }
+     }
+  });
+}
+
+function getRankClass(rank) {
+  if (rank==1) {
+    return "lucky-rank-1";
+  }
+  if (rank==2) {
+    return "lucky-rank-2";
+  }
+  if (rank==3) {
+    return "lucky-rank-3";
+  }
+  return "lucky-rank-other";
+}
+
+function getRankHtml(rank) {
+  if (rank==1) {
+    return "<span class=\"lucky-lead-medal1\"></span>";
+  }
+  if (rank==2) {
+    return "<span class=\"lucky-lead-medal2\"></span>";
+  }
+  if (rank==3) {
+    return "<span class=\"lucky-lead-medal3\"></span>";
+  }
+  return ""+rank;
+}
+
+function resetLeadersTable() {
+  if (leadersTable != null) {
+    leadersTable.destroy();
+    leadersTable = null;
+  }
 }
 
 function errorPage(title, results) {

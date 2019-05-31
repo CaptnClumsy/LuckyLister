@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import com.clumsy.luckylister.entities.LeaderEntity;
 import com.clumsy.luckylister.entities.UserEntity;
  
 @Repository
@@ -20,4 +21,9 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
 	
 	@Query("SELECT COUNT(*) FROM UserLuckyPokemonEntity t WHERE t.userid=?1")
 	Long findLucky(Long userid);
+	
+	@Query("SELECT u.id AS id, u.displayName AS displayName, COUNT(*) AS total " +
+			"FROM UserEntity u, UserLuckyPokemonEntity p WHERE p.userid=u.id " + 
+			"GROUP BY u.id ORDER BY total DESC")
+	List<LeaderEntity> findLeaders();
 }

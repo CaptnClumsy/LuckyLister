@@ -1,6 +1,7 @@
 package com.clumsy.luckylister.services;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
@@ -11,7 +12,9 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.clumsy.luckylister.data.LeaderDao;
 import com.clumsy.luckylister.data.TotalDao;
+import com.clumsy.luckylister.entities.LeaderEntity;
 import com.clumsy.luckylister.entities.UserEntity;
 import com.clumsy.luckylister.exceptions.UserNotFoundException;
 import com.clumsy.luckylister.repos.UserRepo;
@@ -85,6 +88,18 @@ public class UserService {
 		Long total = userRepo.findTotal();
 		Long amount = userRepo.findLucky(user.getId());
 		return new TotalDao(total, amount);
+	}
+
+	@Transactional(readOnly = true)
+	public List<LeaderDao> getLeaderboard(UserEntity user) {
+		final List<LeaderEntity> leaderEntities = userRepo.findLeaders();
+		final List<LeaderDao> leaders = new ArrayList<>(leaderEntities.size());
+		int rank = 1;
+		for (LeaderEntity leaderEntity : leaderEntities) {
+			LeaderDao leader = new LeaderDao(rank++, leaderEntity.getDisplayName(), leaderEntity.getTotal());
+			leaders.add(leader);
+		}
+		return leaders;
 	}
 
 }

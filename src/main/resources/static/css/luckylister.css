@@ -52,7 +52,7 @@ body {
 .lucky-percent-small {
 	width:42px;
 	height:42px;
-	top: 20px;
+	top: 4px;
     color: white;
 }
 .lucky-percentage-text {
@@ -148,4 +148,52 @@ body {
 }
 .lucky-user-search {
 	margin: 4px;
+}
+.lucky-lead-table {
+    padding: 0px;
+    border: none !important;
+    border-spacing: 0px !important;
+}
+.lucky-rank-1 {
+    font-size: 24px;
+    background-color:#b3d9ff;
+}
+.lucky-rank-2 {
+    font-size: 20px;
+    background-color: #cce6ff;
+}
+.lucky-rank-3 {
+    font-size: 18px;
+    background-color: #e6f2ff;
+}
+#leadersTableBody td {
+    padding: 8px !important;
+    text-align: left;
+}
+.lucky-lead-medal1 {
+    background-image: url('/images/GoldMedal.png');
+    width: 28px;
+    height: 50px;
+    display: block;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+.lucky-lead-medal2 {
+    background-image: url('/images/SilverMedal.png');
+    width: 28px;
+    height: 40px;
+    display: block;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+.lucky-lead-medal3 {
+    background-image: url('/images/BronzeMedal.png');
+    width: 28px;
+    height: 38px;
+    display: block;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+.lucky-lead-total {
+	text-align: center;
 }

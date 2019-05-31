@@ -15,15 +15,17 @@
 
     <base href="/"/>
  
-    <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" />
     <link rel="stylesheet" type="text/css" href="/webjars/bootstrap/css/bootstrap.min.css"/>
-    <link rel="stylesheet" type="text/css" href="css/select2.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/select2.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/datatables.min.css"/>
     <link rel="stylesheet" type="text/css" href="/css/luckylister.css"/>
 
     <script type="text/javascript" src="/webjars/jquery/jquery.min.js"></script>
     <script type="text/javascript" src="/webjars/bootstrap/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="/webjars/js-cookie/js.cookie.js"></script>
-    <script type="text/javascript" src="js/select2.full.min.js"></script>
+    <script type="text/javascript" src="/js/select2.full.min.js"></script>
+    <script type="text/javascript" src="/js/datatables.min.js"></script>
     <script type="text/javascript" src="/js/luckylister-percentage.js"></script>
     <script type="text/javascript" src="/js/luckylister.js"></script>
 
@@ -57,6 +59,10 @@
              <label class="btn btn-primary lucky-nav-button">
                <input type="radio" name="options" id="lucky-nav-mon" autocomplete="off" value="POKEMON">
                <i class="fa fa-question"></i>
+             </label>
+             <label class="btn btn-primary lucky-nav-button">
+               <input type="radio" name="options" id="lucky-nav-leader" autocomplete="off" value="LEADER">
+               <i class="fa fa-trophy"></i>
              </label>
            </div>
          </li>
@@ -126,6 +132,21 @@
       </div>
     </div>
     
+    <div id="lucky-leader-page" class="authenticated" style="display:none">
+      <div class="lucky-leader-pane" id="leaderboard">
+        <table id="leadersTable" class="table lucky-lead-table scrollable" style="width: 100%;">
+          <thead style="display:none;">
+            <tr>
+              <th>Rank</th>
+              <th>Name</th>
+              <th>Lucky</th>
+            </tr>
+          </thead>
+          <tbody id="leadersTableBody" class="lucky-lead-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
     <div class="modal fade" id="errorPage" role="dialog">
     <div class="modal-dialog" role="document">
       <div class="modal-content">

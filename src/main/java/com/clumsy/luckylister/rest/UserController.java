@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.clumsy.luckylister.data.LeaderDao;
 import com.clumsy.luckylister.data.SelectListDao;
 import com.clumsy.luckylister.data.TotalDao;
 import com.clumsy.luckylister.data.UserDao;
@@ -64,4 +65,18 @@ public class UserController {
 			throw new ObjectNotFoundException("Current user not found");
 		}
     }
+
+	@RequestMapping(value = "/user/leaderboard")
+    public List<LeaderDao> getLeaderboard(Principal principal) {
+    	if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+    	try {
+    	    UserEntity user = userService.getCurrentUser(principal);
+		    return userService.getLeaderboard(user);
+    	} catch (UserNotFoundException e) {
+    		throw new ObjectNotFoundException("Current user not found");
+    	}
+	}
+
 }
