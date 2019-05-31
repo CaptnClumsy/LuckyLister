@@ -491,3 +491,5 @@ insert into pokemon (id, dexid, genid, name) values (nextval('pokemonids'), 490,
 insert into pokemon (id, dexid, genid, name) values (nextval('pokemonids'), 491, 4, 'Darkrai');
 insert into pokemon (id, dexid, genid, name) values (nextval('pokemonids'), 492, 4, 'Shaymin');
 insert into pokemon (id, dexid, genid, name) values (nextval('pokemonids'), 493, 4, 'Arceus');
+insert into pokemon (id, dexid, genid, name) values (nextval('pokemonids'), 808, 7, 'Meltan');
+insert into pokemon (id, dexid, genid, name) values (nextval('pokemonids'), 809, 7, 'Melmetal');
