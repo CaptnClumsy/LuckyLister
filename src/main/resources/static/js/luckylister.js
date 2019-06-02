@@ -182,7 +182,11 @@ function getImageUrl(data) {
     iconId = data.dexid;
   }
   image_url = "images/" + 
-	"pokemon_icon_" + iconId + "_00.png";
+	"pokemon_icon_" + iconId + "_00";
+  if (data.done!==true) {
+	  image_url += "_d";
+  }
+  image_url += ".png";
   return image_url;
 }
 

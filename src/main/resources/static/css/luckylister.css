@@ -128,11 +128,6 @@ body {
     display: inline-block;
     white-space: nowrap;
 }
-.lucky-img-outline {
-  -webkit-filter: grayscale(100%) brightness(0);
-  filter: grayscale(100%) brightness(0);
-  opacity: 0.6;
-}
 .lucky-need {
 	color: grey;
 }
