@@ -312,10 +312,11 @@ function showLeaderboard() {
       	  // Initialize the table
           leadersTable = $('#leadersTable').DataTable({
             "autoWidth": true,
-          	"scrollY": 300,
+          	"scrollY": true,
           	"scrollX": true,
           	"searching": false,
-          	"lengthChange": false
+          	"lengthChange": false,
+          	"paging": false
           });
         }
      },
