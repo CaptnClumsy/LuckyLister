@@ -17,11 +17,21 @@ body {
   font-style: normal;
   font-display: block;
 }
+.lucky-top-nav {
+	padding-left: 4px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+.lucky-left-nav {
+	display: flex;
+	align-items: center;
+}
 .lucky-navbar-title {
     font-size: 24px;
     font-weight: bold;
     text-transform: none;
     padding-top: 0px;
+    margin-right: 4px;
 }
 .lucky-navbar-right {
 	justify-content: flex-end;
@@ -39,34 +49,35 @@ body {
 .lucky-nav-percent {
     height: 56px;
     width: 50px;
+    color: white;
 }
 .lucky-percent {
     position:relative;
 }
-.lucky-percent canvas {
-    display: block;
-    position:absolute;
-    top:0;
-    left:0;
-}
-.lucky-percent-small {
-	width:42px;
-	height:42px;
-	top: 4px;
-    color: white;
+.lucky-canvas {
+    top: 6px;
+    position: relative;
+    width: 42px;
+    height: 42px;
 }
 .lucky-percentage-text {
     display:block;
     text-align:center;
     font-weight: bold;
-    position:absolute;
-    top:0;
-    left:0;
+    position: relative;
+    top: -42px;
+    left: 0;
+    width: 42px;
+    height: 42px;
+    line-height: 42px;
 }
 .lucky-percentage-details {
-	position: absolute;
+	position: relative;
 	text-align: center;
 	font-size: 10px;
+	width: 42px;
+    height: 42px;
+    top: -43px;
 }
 .lucky-container {
 	width: 100%;

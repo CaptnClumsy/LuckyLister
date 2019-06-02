@@ -32,14 +32,15 @@
 </head>
 
   <body>
-    <nav class="navbar navbar-expand-sm navbar-static-top navbar-dark bg-primary">
-      <a class="navbar-brand lucky-navbar-title" href="/tos.html">
-        <img src="/images/clover.png" width="30" height="30" class="d-inline-block align-text-bottom" alt="">
-        LuckyLister
-      </a>
-      <span class="authenticated lucky-nav-percent" style="display: none;">
-        <span id="lucky-gold-percent" class="lucky-navbar-label lucky-percent lucky-percent-small"></span>
-      </span>
+    <nav class="navbar navbar-expand-sm navbar-static-top navbar-dark bg-primary lucky-top-nav">
+      <div class="lucky-left-nav">
+        <a class="navbar-brand lucky-navbar-title" href="/tos.html">
+          <img src="/images/clover.png" width="30" height="30" class="d-inline-block align-text-bottom" alt="">
+          LuckyLister
+        </a>
+        <div id="lucky-gold-percent" class="authenticated lucky-nav-percent" style="display: none;">
+        </div>
+      </div>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button> 
@@ -97,7 +98,7 @@
           <input type="text" id="lucky-searchbox" class="form-control lucky-searchbox" onkeyup="searchPokemon()" placeholder="Search by name..">
           <div id="lucky-filter-group" class="btn-group btn-group-toggle lucky-button-group" data-toggle="buttons">
             <label class="btn btn-info lucky-small-button active">
-              <input type="radio" name="options" id="lucky-filter-all" autocomplete="off" value="ALL" checked>All
+              <input type="radio" name="options" id="lucky-filter-all" autocomplete="off" value="ALL">All
             </label>
             <label class="btn btn-info lucky-small-button">
               <input type="radio" name="options" id="luck-filter-need" autocomplete="off" value="NEED">Need

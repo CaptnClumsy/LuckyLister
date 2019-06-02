@@ -25,3 +25,4 @@ create table user_lucky_pokemon (
 );
 
 create index ulp_by_user on user_lucky_pokemon(userid);
+create unique index on user_lucky_pokemon(userid, pokemonid);

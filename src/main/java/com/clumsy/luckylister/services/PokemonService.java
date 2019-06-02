@@ -72,7 +72,7 @@ public class PokemonService {
 			dao.setDone(false);
 			// delete the row
 			if (entity!=null) {
-		        luckyPokemonRepo.delete(entity);	        
+		        luckyPokemonRepo.delete(entity);
 			}
 			return dao;
 		} 

@@ -1,36 +1,31 @@
 function drawPercentage(parentElement, size, lineWidth, amount, total, bgColour, fgColour, includeCounts, isLargeFont) {
-    // Work out the percentage
+	// Work out the percentage
 	var percent = 0;
    	if (total != 0) {
    		percent = Math.round((amount / total) * 100);
     }
     // Create the canvas
    	var canvas = document.createElement('canvas');
+   	canvas.className = "lucky-canvas";
    	if (typeof(G_vmlCanvasManager) !== 'undefined') {
 		G_vmlCanvasManager.initElement(canvas);
 	}
    	var ctx = canvas.getContext('2d');
 	canvas.width = canvas.height = size;
    	// Add the percentage text
-    var span = document.createElement('span');
-    span.className = "lucky-percentage-text";
-    span.style.width = ""+size+"px";
-    span.style.height = ""+size+"px";
-	span.style.lineHeight = ""+size+"px";
-	span.style.fontSize = getFontSize(isLargeFont, percent);
-	span.textContent = '' + percent + '%';
-	if (includeCounts) {
-		// Add the details of the amount verses total
-		var detailsSpan = document.createElement('span');
-		detailsSpan.style.width = ""+size+"px";
-		detailsSpan.style.top = ""+size+"px";
-		detailsSpan.className = "lucky-percentage-details";
-		detailsSpan.innerHTML = "" + amount + "/" + total;
-		parentElement.appendChild(detailsSpan);
-	}
+    var text = document.createElement('div');
+    text.className = "lucky-percentage-text";
+    text.style.fontSize = getFontSize(isLargeFont, percent);
+    text.textContent = '' + percent + '%';
+	// Add the details of the amount verses total
+	var details = document.createElement('div');
+	details.className = "lucky-percentage-details";
+	details.innerHTML = "" + amount + "/" + total;
+	parentElement.appendChild(details);
     // Append the other elements to the specified parent element
-	parentElement.appendChild(span);
 	parentElement.appendChild(canvas);
+	parentElement.appendChild(text);
+	parentElement.appendChild(details);
 
 	// Draw the circle on the canvas
 	var rotate = 0;

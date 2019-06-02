@@ -231,7 +231,7 @@ function searchUserPokemon() {
 
 function searchPokemon() {
   // Find which radio button is selected
-  var filter = $('#lucky-filter-group input:radio:checked').val()
+  var filter = $('#lucky-filter-group .active input').val();
   filterPokemon(filter);
 }
 
