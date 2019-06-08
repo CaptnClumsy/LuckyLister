@@ -14,6 +14,7 @@ create table pokemon (
   dexid bigint not null,
   genid bigint not null,
   name varchar(100) not null,
+  available boolean,
   primary key (id)
 );
 

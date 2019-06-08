@@ -11,6 +11,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import com.clumsy.luckylister.data.ErrorDao;
 import com.clumsy.luckylister.exceptions.NotLoggedInException;
 import com.clumsy.luckylister.exceptions.ObjectNotFoundException;
+import com.clumsy.luckylister.exceptions.UserServiceException;
 
 @ControllerAdvice
 public class AppExceptionHandler extends ResponseEntityExceptionHandler {
@@ -26,5 +27,11 @@ public class AppExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, new ErrorDao("Error", "Not logged in"), 
           new HttpHeaders(), HttpStatus.FORBIDDEN, request);
     }
-    
+
+    @ExceptionHandler(value = { UserServiceException.class })
+    protected ResponseEntity<Object> handleOtherError(RuntimeException ex, WebRequest request) {
+        return handleExceptionInternal(ex, new ErrorDao("Error", ex.getMessage()), 
+          new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+    }
+
 }

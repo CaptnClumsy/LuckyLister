@@ -16,6 +16,7 @@ import com.clumsy.luckylister.data.LeaderDao;
 import com.clumsy.luckylister.data.TotalDao;
 import com.clumsy.luckylister.entities.LeaderEntity;
 import com.clumsy.luckylister.entities.UserEntity;
+import com.clumsy.luckylister.exceptions.UserAlreadyRegisteredException;
 import com.clumsy.luckylister.exceptions.UserNotFoundException;
 import com.clumsy.luckylister.repos.UserRepo;
 
@@ -41,24 +42,31 @@ public class UserService {
 	}
 
 	@Transactional
-	public UserEntity getCurrentUser(final Principal principal) throws UserNotFoundException {
+	public UserEntity getCurrentUser(final Principal principal) throws UserNotFoundException, UserAlreadyRegisteredException {
 		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
 			return getDefaultAccount();
 		}
 		UserEntity user = userRepo.findOneByName(principal.getName());
 		if (user == null) {
-			// Automatically register new users
-			UserEntity newUser = new UserEntity();
-			newUser.setName(principal.getName());
-			newUser.setAdmin(false);
+			String displayName = "none";
+			// Get this users display name
 			if (principal instanceof OAuth2Authentication) {
 	        	OAuth2Authentication auth = (OAuth2Authentication)principal;
 	        	@SuppressWarnings("unchecked")
 				LinkedHashMap<String,String> details = (LinkedHashMap<String, String>) auth.getUserAuthentication().getDetails();
-	        	newUser.setDisplayName(details.get("name"));
-	        } else {
-	        	newUser.setDisplayName("none");
+	        	displayName = details.get("name");
 	        }
+			// Check nobody with this name is already registered
+			UserEntity dupUser = userRepo.findOneByDisplayName(displayName);
+			if (dupUser!=null) {
+				throw new UserAlreadyRegisteredException("User with name "+displayName+" already exists");
+			}
+			// Automatically register the new user
+			UserEntity newUser = new UserEntity();
+			newUser.setName(principal.getName());
+			newUser.setDisplayName(displayName);
+			newUser.setAdmin(false);
+			
 			UserEntity savedUser = userRepo.save(newUser);
 			return savedUser;
 		}

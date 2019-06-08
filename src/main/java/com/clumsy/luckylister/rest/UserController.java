@@ -16,7 +16,9 @@ import com.clumsy.luckylister.data.UserDao;
 import com.clumsy.luckylister.entities.UserEntity;
 import com.clumsy.luckylister.exceptions.NotLoggedInException;
 import com.clumsy.luckylister.exceptions.ObjectNotFoundException;
+import com.clumsy.luckylister.exceptions.UserAlreadyRegisteredException;
 import com.clumsy.luckylister.exceptions.UserNotFoundException;
+import com.clumsy.luckylister.exceptions.UserServiceException;
 import com.clumsy.luckylister.services.UserService;
 
 @RestController
@@ -32,6 +34,8 @@ public class UserController {
 			return UserDao.fromEntity(user);
 		} catch (UserNotFoundException e) {
 			throw new ObjectNotFoundException("Current user not found");
+		} catch (UserAlreadyRegisteredException e) {
+			throw new UserServiceException(e.getMessage());
 		}
     }
 	
@@ -63,6 +67,8 @@ public class UserController {
 			return stats;
 		} catch (UserNotFoundException e) {
 			throw new ObjectNotFoundException("Current user not found");
+		} catch (UserAlreadyRegisteredException e) {
+			throw new UserServiceException(e.getMessage());
 		}
     }
 
@@ -76,7 +82,9 @@ public class UserController {
 		    return userService.getLeaderboard(user);
     	} catch (UserNotFoundException e) {
     		throw new ObjectNotFoundException("Current user not found");
-    	}
+    	} catch (UserAlreadyRegisteredException e) {
+    		throw new UserServiceException(e.getMessage());
+		}
 	}
 
 }

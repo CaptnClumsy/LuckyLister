@@ -28,4 +28,7 @@ public class PokemonEntity {
 	@Column(name = "name")
 	private String name;
 
+	@Column(name = "available")
+	private Boolean available;
+
 }

@@ -32,7 +32,7 @@
 </head>
 
   <body>
-    <nav class="navbar navbar-expand-sm navbar-static-top navbar-dark bg-primary lucky-top-nav">
+    <nav id ="lucky-nav-outer" class="navbar navbar-expand-sm navbar-static-top navbar-dark bg-primary lucky-top-nav">
       <div class="lucky-left-nav">
         <a class="navbar-brand lucky-navbar-title" href="/tos.html">
           <img src="/images/clover.png" width="30" height="30" class="d-inline-block align-text-bottom" alt="">
@@ -94,7 +94,7 @@
       </div>
       
       <div id="lucky-home-page" class="authenticated" style="display:none">
-        <div class="lucky-grid-header">
+        <div id ="lucky-grid-header" class="lucky-grid-header">
           <input type="text" id="lucky-searchbox" class="form-control lucky-searchbox" onkeyup="searchPokemon()" placeholder="Search by name..">
           <div id="lucky-filter-group" class="btn-group btn-group-toggle lucky-button-group" data-toggle="buttons">
             <label class="btn btn-info lucky-small-button active">
@@ -111,14 +111,13 @@
         <div class="lucky-grid" id="pokemon">
         </div>
       </div>
-    </div>
     
-    <div id="lucky-user-page" class="authenticated" style="display:none">
+    <div id="lucky-user-page" style="display:none">
       <div>
-        <div class="alert alert-info lucky-small-alert" role="alert">
+        <div id="lucky-user-help" class="alert alert-info lucky-small-alert" role="alert">
           Select the trainer you want to trade with to see what Pokemon they need.
         </div>
-        <div class="lucky-user-search"><select id="user-search" name="user-search" class="form-control"><option></option></select></div>
+        <div id="lucky-user-search" class="lucky-user-search"><select id="user-search" name="user-search" class="form-control"><option></option></select></div>
       </div>
       <div class="lucky-grid-header" id="user-pokemon-header" style="display: none;">
         <input type="text" id="lucky-user-searchbox" class="form-control lucky-searchbox" onkeyup="searchUserPokemon()" placeholder="Search by pokemon name..">
@@ -127,13 +126,13 @@
       </div>
     </div>
 
-    <div id="lucky-pokemon-page" class="authenticated" style="display:none">
+    <div id="lucky-pokemon-page" style="display:none">
       <div class="jumbotron">
           <h1 class="display-4">Coming Soon...</h1>
       </div>
     </div>
     
-    <div id="lucky-leader-page" class="authenticated" style="display:none">
+    <div id="lucky-leader-page" style="display:none">
       <div class="lucky-leader-pane" id="leaderboard">
         <table id="leadersTable" class="table lucky-lead-table scrollable" style="width: 100%;">
           <thead style="display:none;">
@@ -146,6 +145,7 @@
           <tbody id="leadersTableBody" class="lucky-lead-table-body"></tbody>
         </table>
       </div>
+    </div>
     </div>
 
     <div class="modal fade" id="errorPage" role="dialog">

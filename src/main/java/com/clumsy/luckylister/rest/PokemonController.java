@@ -18,7 +18,9 @@ import com.clumsy.luckylister.data.UpdatePokemonDao;
 import com.clumsy.luckylister.entities.UserEntity;
 import com.clumsy.luckylister.exceptions.NotLoggedInException;
 import com.clumsy.luckylister.exceptions.ObjectNotFoundException;
+import com.clumsy.luckylister.exceptions.UserAlreadyRegisteredException;
 import com.clumsy.luckylister.exceptions.UserNotFoundException;
+import com.clumsy.luckylister.exceptions.UserServiceException;
 import com.clumsy.luckylister.services.PokemonService;
 import com.clumsy.luckylister.services.UserService;
 
@@ -42,6 +44,8 @@ public class PokemonController {
 			return pokemon;
 		} catch (UserNotFoundException e) {
 			throw new ObjectNotFoundException("Current user not found");
+		} catch (UserAlreadyRegisteredException e) {
+			throw new UserServiceException(e.getMessage());
 		}
     }
 	
@@ -57,6 +61,8 @@ public class PokemonController {
             return dao;
 		} catch (UserNotFoundException e) {
 			throw new ObjectNotFoundException("Current user not found");
+		} catch (UserAlreadyRegisteredException e) {
+			throw new UserServiceException(e.getMessage());
 		}
     }
 	

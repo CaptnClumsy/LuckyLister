@@ -27,8 +27,15 @@ function initPage() {
 	  initUser();
 	  initPokemon();
 	  showHome();
+	},
+	error: function (data) {
+	  if (data.status==500) {
+	    errorPage("User already exists", data);
+	  }
 	}
   });
+  window.onload = resize;
+  window.onresize = resize;
 }
 
 function initNavbar() {
@@ -61,9 +68,18 @@ function showView(view) {
 		$("#lucky-leader-page").show();
 		showLeaderboard();
 	}
+	resize();
 }
 
 function initHome() {
+  // resize scrollable pokemon grid when user collapses/expands header
+  $('.navbar-collapse').on('shown.bs.collapse', function () {
+    resize();
+  })
+  $('.navbar-collapse').on('hidden.bs.collapse', function () {
+    resize();
+  });
+  // setup the pokemon filter
   $('#lucky-filter-group .btn').on('click', function(event) {
 	var val = $(this).find('input').val();
     filterPokemon(val);
@@ -104,6 +120,7 @@ function showUserPokemon(id) {
 	  str += "</button>\n";
 	}
 	$("#user-pokemon").html(str);
+	resize();
   });
 }
 
@@ -116,12 +133,17 @@ function showHome() {
     $("#pokemon").html("");
     var str = "";
     for (var i=0; i<data.length; i++) {
-      str += "<button id=\"pokemon-" + data[i].id + "\" class=\"lucky-cell\" onclick=\"selectPokemon(" + data[i].id + ")\">";
+      str += "<button id=\"pokemon-" + data[i].id + "\" class=\"lucky-cell\" ";
+      if (data[i].available===true) {
+        str+= "onclick=\"selectPokemon(" + data[i].id + ")\"";
+      }
+      str += ">";
       str += getCellHtml(data[i], width);
       str += "</button>\n";
     }
     $("#pokemon").html(str);
     resetPercentage();
+    resize();
   });
 }
 
@@ -155,19 +177,22 @@ function selectPokemon(id) {
 function getCellHtml(data, width) {
   var str = "";
   var labelClass = "lucky-need";
-  var imgClass = "";
+  var imgClass = "lucky-img ";
   if (data.done===true) {
 	labelClass = "lucky-got";
 	str += "<img class=\"lucky-cell-tick\" src=\"images/tickmark.png\"></img>";
   }
   var image_url = getImageUrl(data);
   str += "<img src=\"" + image_url + "\" ";
-  str += "width=\"" + width + "\" "
+  str += "width=\"" + width + "\" ";
   if (data.done!==true) {
-	  str += " class=\"lucky-img-outline\"";
+	  imgClass += "lucky-img-outline";
   }
-  str += "></img>" +
-    "<span class=\"lucky-cell-label " + labelClass + "\">" + data.name + "<\span>" +
+  str += " class=\""+imgClass+"\"></img>";
+  if (data.available!==true) {
+	  str += "<span class=\"lucky-img-notavailable\"></span>";
+  }
+  str += "<span class=\"lucky-cell-label " + labelClass + "\">" + data.name + "</span>" +
 	"</button>\n";
   return str;
 }
@@ -205,6 +230,7 @@ function getImageSize(grid) {
 function logout() {
   $.post("/logout", function() {
     $("#user").html('');
+    showView("HOME");
     $(".unauthenticated").show();
     $(".authenticated").hide();
   })
@@ -312,7 +338,7 @@ function showLeaderboard() {
       	  // Initialize the table
           leadersTable = $('#leadersTable').DataTable({
             "autoWidth": true,
-          	"scrollY": true,
+          	"scrollY": "400px",
           	"scrollX": true,
           	"searching": false,
           	"lengthChange": false,
@@ -377,4 +403,32 @@ function errorPage(title, results) {
     $('#errorPageBody').text(results.responseJSON.message);
   }
   $('#errorPage').modal('show');
+}
+
+function resize() {
+  var headerDiv = document.getElementById("lucky-nav-outer");
+  var headerHeight = headerDiv.offsetHeight + 30; // for bit at bottom of iphone screen
+  var gridHeader = document.getElementById("lucky-grid-header");
+  var gridHeaderHeight = gridHeader.offsetHeight;
+  
+  //Get view height
+  var viewportHeight = document.getElementsByTagName('body')[0].clientHeight;
+
+  // resize home page
+  var homeContentDiv = document.getElementById("pokemon");  
+  // Set the height to view height - headerHeight
+  homeContentDiv.setAttribute("style","height:"+(viewportHeight - (headerHeight+gridHeaderHeight))+"px");
+  homeContentDiv.style.height=viewportHeight - (headerHeight+gridHeaderHeight);
+  
+  // resize user page
+  var helpHeader = document.getElementById("lucky-user-help");
+  headerHeight += helpHeader.offsetHeight;
+  var searchHeader = document.getElementById("lucky-user-search");
+  headerHeight += searchHeader.offsetHeight;
+  var pokemonHeader = document.getElementById("user-pokemon-header");
+  headerHeight += pokemonHeader.offsetHeight;
+  var userContentDiv = document.getElementById("user-pokemon");
+  //Set the height to view height - headerHeight
+  userContentDiv.setAttribute("style","height:"+(viewportHeight - headerHeight)+"px");
+  userContentDiv.style.height=viewportHeight - headerHeight;
 }

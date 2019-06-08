@@ -12,5 +12,6 @@
   <include file="db/changelogs/schema.sql"/>
   <include file="db/changelogs/initial_data.sql"/>
   <include file="db/changelogs/pokemon_data.sql"/>
+  <include file="db/changelogs/available_pokemon.sql"/>
 
 </databaseChangeLog>
