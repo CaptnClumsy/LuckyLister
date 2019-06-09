@@ -47,6 +47,29 @@ body {
 	border-color: white;
     width: 30px;
 }
+.lucky-login-button {
+	background-color: #4267b2;
+    padding-left: 4px;
+    padding-right: 6px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    margin-top: 2px;
+}
+.lucky-login-icon {
+	padding-right: 4px;
+	padding-left: 2px;
+}
+.lucky-nav-dropdown {
+	display: inline-block;
+	position: relative;
+}
+.lucky-user-menu {
+	min-width: 100px;
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: absolute !important;
+}
 .lucky-nav-percent {
     height: 56px;
     width: 50px;

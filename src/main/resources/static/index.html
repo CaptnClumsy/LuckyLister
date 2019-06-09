@@ -70,13 +70,16 @@
         </ul>
         <ul class="navbar-nav">
           <li class="nav-item unauthenticated">
-            <a class="nav-link" href="/login/facebook">Login</a>
+            <a href="/login/facebook" class="btn btn-primary lucky-login-button"><i class="fa fa-facebook lucky-login-icon"></i>Login</a>
           </li>
-          <li class="nav-item dropdown authenticated" style="display:none">
-            <a class="nav-link dropdown-toggle" href="#" id="user" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            </a>
-            <div class="dropdown-menu" aria-labelledby="user">
-              <button class="dropdown-item" onClick="logout()">Logout</button>
+          <li class="nav-link authenticated" style="display:none">
+            <div class="lucky-nav-dropdown">
+              <button class="dropdown-toggle btn btn-primary lucky-nav-dropdown" type="button" id="user" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              </button>
+              <div class="dropdown-menu lucky-user-menu" aria-labelledby="user">
+                <button class="dropdown-item" onClick="friends()">Friends</button>
+                <button class="dropdown-item" onClick="logout()">Logout</button>
+              </div>
             </div>
           </li>
         </ul>
@@ -129,14 +132,24 @@
     <div id="lucky-pokemon-page" style="display:none">
       <div>
         <div id="lucky-question-help" class="alert alert-info lucky-small-alert" role="alert">
-          Select the Pokemon you want to trade to see who needs it.
+          Select the Pokemon you want to trade to see who needs it for their lucky collection.
         </div>
         <div id="lucky-question-search" class="lucky-question-search"><select id="question-search" name="question-search" class="form-control"><option></option></select></div>
       </div>
       <div class="lucky-grid" id="question-users" style="display: none;">
       </div>
     </div>
-    
+
+    <div id="lucky-friends-page" style="display:none">
+      <div>
+        <div id="lucky-friends-help" class="alert alert-info lucky-small-alert" role="alert">
+          Select the trainers that you trade with the most to limit which users you see first in lists.
+        </div>
+      </div>
+      <div class="lucky-grid" id="lucky-friends">
+      </div>
+    </div>
+
     <div id="lucky-leader-page" style="display:none">
       <div class="lucky-leader-pane" id="leaderboard">
         <table id="leadersTable" class="table lucky-lead-table scrollable" style="width: 100%;">

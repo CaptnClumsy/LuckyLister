@@ -50,23 +50,34 @@ function showView(view) {
 		$("#lucky-pokemon-page").hide();
 		$("#lucky-user-page").hide();
 		$("#lucky-leader-page").hide();
+		$("#lucky-friends-page").hide();
 		$("#lucky-home-page").show();
 	} else if (view==="USER") {
 		$("#lucky-home-page").hide();
 		$("#lucky-pokemon-page").hide();
 		$("#lucky-leader-page").hide();
+		$("#lucky-friends-page").hide();
 		$("#lucky-user-page").show();
 	} else if (view==="POKEMON") {
 		$("#lucky-home-page").hide();
 		$("#lucky-user-page").hide();
 		$("#lucky-leader-page").hide();
+		$("#lucky-friends-page").hide();
 		$("#lucky-pokemon-page").show();
+		showPokemonPage();
 	} else if (view==="LEADER") {
 		$("#lucky-home-page").hide();
 		$("#lucky-user-page").hide();
 		$("#lucky-pokemon-page").hide();
+		$("#lucky-friends-page").hide();
 		$("#lucky-leader-page").show();
 		showLeaderboard();
+	} else if (view==="FRIENDS") {
+		$("#lucky-home-page").hide();
+		$("#lucky-user-page").hide();
+		$("#lucky-pokemon-page").hide();
+		$("#lucky-leader-page").hide();
+		$("#lucky-friends-page").show();
 	}
 	resize();
 }
@@ -144,6 +155,13 @@ function initPokemon() {
 	  errorPage("Failed to query pokemon data", result);
 	}
   });
+}
+
+function showPokemonPage() {
+	var selected = $('#question-search').select2('data');
+	if (selected.length!=0 && selected[0].id!="") { 
+	  showUsersForPokemon(selected[0].id);
+	}
 }
 
 function showUsersForPokemon(id) {
@@ -447,17 +465,11 @@ function errorPage(title, results) {
 function resize() {
   var headerDiv = document.getElementById("lucky-nav-outer");
   var headerHeight = headerDiv.offsetHeight + 20; // for bit at bottom of iphone screen
-  var gridHeader = document.getElementById("lucky-grid-header");
-  var gridHeaderHeight = gridHeader.offsetHeight;
-  
-  //Get view height
-  var viewportHeight = document.getElementsByTagName('body')[0].clientHeight;
 
   // resize home page
-  var homeContentDiv = document.getElementById("pokemon");  
-  // Set the height to view height - headerHeight
-  homeContentDiv.setAttribute("style","height:"+(viewportHeight - (headerHeight+gridHeaderHeight))+"px");
-  homeContentDiv.style.height=viewportHeight - (headerHeight+gridHeaderHeight);
+  var gridHeader = document.getElementById("lucky-grid-header");
+  var gridHeaderHeight = gridHeader.offsetHeight;
+  setContentHeight("pokemon", headerHeight+gridHeaderHeight);
   
   // resize user page
   var helpHeader = document.getElementById("lucky-user-help");
@@ -466,18 +478,27 @@ function resize() {
   userHeaderHeight += searchHeader.offsetHeight;
   var pokemonHeader = document.getElementById("user-pokemon-header");
   userHeaderHeight += pokemonHeader.offsetHeight;
-  var userContentDiv = document.getElementById("user-pokemon");
-  //Set the height to view height - userHeaderHeight
-  userContentDiv.setAttribute("style","height:"+(viewportHeight - userHeaderHeight)+"px");
-  userContentDiv.style.height=viewportHeight - userHeaderHeight;
+  setContentHeight("user-pokemon", userHeaderHeight);
   
   // resize pokemon page
   helpHeader = document.getElementById("lucky-question-help");
   var pokemonHeaderHeight = headerHeight + helpHeader.offsetHeight;
   searchHeader = document.getElementById("lucky-question-search");
   pokemonHeaderHeight += searchHeader.offsetHeight;
-  var pokemonContentDiv = document.getElementById("question-users");
-  //Set the height to view height - pokemonHeaderHeight
-  pokemonContentDiv.setAttribute("style","height:"+(viewportHeight - pokemonHeaderHeight)+"px");
-  pokemonContentDiv.style.height=viewportHeight - pokemonHeaderHeight;
+  setContentHeight("question-users", pokemonHeaderHeight);
+
+  // resize friends page
+  var friendsHeader = document.getElementById("lucky-friends-help");
+  var friendsHeaderHeight = headerHeight + friendsHeader.offsetHeight;
+  setContentHeight("lucky-friends", friendsHeaderHeight);
+}
+
+function setContentHeight(id, height) {
+  var viewportHeight = document.getElementsByTagName('body')[0].clientHeight;
+  var element = document.getElementById(id);
+  element.setAttribute("style","height:"+(viewportHeight - height)+"px");
+  element.style.height=viewportHeight - height;
+}
+
+function friends() {
 }
