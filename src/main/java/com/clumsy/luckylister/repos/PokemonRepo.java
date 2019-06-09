@@ -15,6 +15,6 @@ public interface PokemonRepo extends JpaRepository<PokemonEntity, Long> {
 	@Query("SELECT t FROM PokemonEntity t WHERE t.available=true AND t.id NOT IN (SELECT t1.pokemonid FROM UserLuckyPokemonEntity t1 WHERE t1.userid=?1) ORDER BY t.dexid ASC")
 	List<PokemonEntity> findAllForUser(Long userId);
 	
-	@Query("SELECT t FROM PokemonEntity t ORDER BY t.dexid ASC")
+	@Query("SELECT t FROM PokemonEntity t WHERE t.available=true ORDER BY t.dexid ASC")
 	List<PokemonEntity> findAll();
 }

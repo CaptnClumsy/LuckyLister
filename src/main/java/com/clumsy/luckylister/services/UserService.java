@@ -2,6 +2,7 @@ package com.clumsy.luckylister.services;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
@@ -108,6 +109,15 @@ public class UserService {
 			leaders.add(leader);
 		}
 		return leaders;
+	}
+
+	@Transactional(readOnly = true)
+	public List<UserEntity> getAllUsersWithPokemon(Long pokemonId) {
+		List<UserEntity> users = userRepo.findAllByPokemonId(pokemonId);
+		if (users == null) {
+			users = Collections.emptyList();
+		}
+		return users;
 	}
 
 }

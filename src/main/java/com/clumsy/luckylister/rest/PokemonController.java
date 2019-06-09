@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.clumsy.luckylister.data.PokemonDao;
+import com.clumsy.luckylister.data.SelectListDao;
 import com.clumsy.luckylister.data.UpdatePokemonDao;
 import com.clumsy.luckylister.entities.UserEntity;
 import com.clumsy.luckylister.exceptions.NotLoggedInException;
@@ -77,6 +78,19 @@ public class PokemonController {
 			return pokemon;
 		} catch (UserNotFoundException e) {
 			throw new ObjectNotFoundException("User not found");
+		}
+    }
+
+	@RequestMapping("/pokemon/all")
+	public List<SelectListDao> listAllPokemon(Principal principal) {
+		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+		try {
+			List<SelectListDao> pokemon = pokemonService.listAllPokemon();
+			return pokemon;
+		} catch (ObjectNotFoundException e) {
+			throw new ObjectNotFoundException("No Pokemon found");
 		}
     }
 }

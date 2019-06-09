@@ -125,6 +125,45 @@ function showUserPokemon(id) {
 }
 
 function initPokemon() {
+  $.ajax({
+    type: "GET",
+	contentType: "application/json; charset=utf-8",
+	url: "/pokemon/all",
+	success: function (data) {
+	  $('#question-search').select2({
+	    placeholder: "Select a Pokemon",
+	    width: '90%',
+	    data: data
+	  });
+	  $('#question-search').on("select2:select", function(e) {
+	    $("#question-users").show();
+	    showUsersForPokemon(e.params.data.id);
+	  });
+	},
+	error: function (result) {
+	  errorPage("Failed to query pokemon data", result);
+	}
+  });
+}
+
+function showUsersForPokemon(id) {
+  $.get("/user/pokemon/"+id, function(data) {
+	$("#question-users").html("");
+	var str = "";
+	if (data.length!=0) {
+	  for (var i=0; i<data.length; i++) {
+	    str += "<span id=\"user-" + data[i].id + "\" class=\"badge badge-primary lucky-user-cell\">";
+	    str += data[i].text;
+	    str += "</span>\n";
+	  }
+	} else {
+		str="<div class=\"jumbotron lucky-professor-jumbo\">" +
+		  "<p class=\"lead\">Nobody needs this Pokemon...well maybe one person does</p>" +
+		  "<div class=\"lucky-professor\"></div></div>"
+	}
+	$("#question-users").html(str);
+	resize();
+  });
 }
 
 function showHome() {
@@ -407,7 +446,7 @@ function errorPage(title, results) {
 
 function resize() {
   var headerDiv = document.getElementById("lucky-nav-outer");
-  var headerHeight = headerDiv.offsetHeight + 30; // for bit at bottom of iphone screen
+  var headerHeight = headerDiv.offsetHeight + 20; // for bit at bottom of iphone screen
   var gridHeader = document.getElementById("lucky-grid-header");
   var gridHeaderHeight = gridHeader.offsetHeight;
   
@@ -422,13 +461,23 @@ function resize() {
   
   // resize user page
   var helpHeader = document.getElementById("lucky-user-help");
-  headerHeight += helpHeader.offsetHeight;
+  var userHeaderHeight = headerHeight + helpHeader.offsetHeight;
   var searchHeader = document.getElementById("lucky-user-search");
-  headerHeight += searchHeader.offsetHeight;
+  userHeaderHeight += searchHeader.offsetHeight;
   var pokemonHeader = document.getElementById("user-pokemon-header");
-  headerHeight += pokemonHeader.offsetHeight;
+  userHeaderHeight += pokemonHeader.offsetHeight;
   var userContentDiv = document.getElementById("user-pokemon");
-  //Set the height to view height - headerHeight
-  userContentDiv.setAttribute("style","height:"+(viewportHeight - headerHeight)+"px");
-  userContentDiv.style.height=viewportHeight - headerHeight;
+  //Set the height to view height - userHeaderHeight
+  userContentDiv.setAttribute("style","height:"+(viewportHeight - userHeaderHeight)+"px");
+  userContentDiv.style.height=viewportHeight - userHeaderHeight;
+  
+  // resize pokemon page
+  helpHeader = document.getElementById("lucky-question-help");
+  var pokemonHeaderHeight = headerHeight + helpHeader.offsetHeight;
+  searchHeader = document.getElementById("lucky-question-search");
+  pokemonHeaderHeight += searchHeader.offsetHeight;
+  var pokemonContentDiv = document.getElementById("question-users");
+  //Set the height to view height - pokemonHeaderHeight
+  pokemonContentDiv.setAttribute("style","height:"+(viewportHeight - pokemonHeaderHeight)+"px");
+  pokemonContentDiv.style.height=viewportHeight - pokemonHeaderHeight;
 }

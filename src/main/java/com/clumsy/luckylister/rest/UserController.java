@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -48,7 +49,7 @@ public class UserController {
 			List<UserEntity> users = userService.getAllUsers();
 			List<SelectListDao> userDaos = new ArrayList<>(users.size());
 			for (UserEntity user : users) {
-				userDaos.add(SelectListDao.fromEntity(user));
+				userDaos.add(SelectListDao.fromUserEntity(user));
 			}
 			return userDaos;
 		} catch (UserNotFoundException e) {
@@ -86,5 +87,18 @@ public class UserController {
     		throw new UserServiceException(e.getMessage());
 		}
 	}
+	
+	@RequestMapping("/user/pokemon/{id}")
+	public List<SelectListDao> users(@PathVariable("id") Long pokemonId, Principal principal) {
+		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+		List<UserEntity> users = userService.getAllUsersWithPokemon(pokemonId);
+		List<SelectListDao> userDaos = new ArrayList<>(users.size());
+		for (UserEntity user : users) {
+			userDaos.add(SelectListDao.fromUserEntity(user));
+		}
+		return userDaos;
+    }
 
 }

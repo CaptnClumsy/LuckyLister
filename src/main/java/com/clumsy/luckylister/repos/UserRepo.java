@@ -28,4 +28,11 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
 	List<LeaderEntity> findLeaders();
 
 	UserEntity findOneByDisplayName(String displayName);
+
+	@Query("SELECT t FROM UserEntity t WHERE t.id != 0 AND " +
+			" t.id NOT IN (" +
+			  "SELECT l.userid FROM UserLuckyPokemonEntity l WHERE " +
+			  "l.pokemonid=?1) " +
+			"ORDER BY t.displayName ASC")
+	List<UserEntity> findAllByPokemonId(Long pokemonId);
 }

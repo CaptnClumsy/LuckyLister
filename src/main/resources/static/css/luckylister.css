@@ -216,3 +216,25 @@ body {
 .lucky-lead-total {
 	text-align: center;
 }
+.lucky-user-cell {
+	position: relative;
+    flex: 0 0 14.2857143%;
+    align-self: baseline;
+    margin: 4px;
+    font-size: 18px;
+}
+#question-users {
+	margin-top: 4px;
+}
+.lucky-professor {
+	background-image: url('/images/professor.png');
+	width: 100%;
+	height: 100%;
+	display: block;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+.lucky-professor-jumbo {
+    padding: 8px;
+    height: 100%;
+}

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.clumsy.luckylister.data.PokemonDao;
+import com.clumsy.luckylister.data.SelectListDao;
 import com.clumsy.luckylister.entities.PokemonEntity;
 import com.clumsy.luckylister.entities.UserEntity;
 import com.clumsy.luckylister.entities.UserLuckyPokemonEntity;
@@ -88,5 +89,19 @@ public class PokemonService {
 		newEntity.setUserid(user.getId());
 		luckyPokemonRepo.save(newEntity);
 		return dao;
+	}
+
+	@Transactional(readOnly = true)
+	public List<SelectListDao> listAllPokemon() throws ObjectNotFoundException {
+		final List<PokemonEntity> entities = pokemonRepo.findAll();
+		if (entities==null) {
+			throw new ObjectNotFoundException("Unable to find pokemon");
+		}
+		List<SelectListDao> daos = new ArrayList<>(entities.size());
+		for (PokemonEntity entity : entities) {
+			final SelectListDao dao = SelectListDao.fromPokemonEntity(entity);
+			daos.add(dao);
+		}
+		return daos;
 	}
 }
