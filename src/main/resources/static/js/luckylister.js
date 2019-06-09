@@ -1,4 +1,5 @@
 var leadersTable = null;
+var userSelect = null;
 
 function initPage() {
   $.ajaxSetup({
@@ -113,7 +114,7 @@ function initUser() {
     	}
         return newObj;
       });
-      $('#user-search').select2({
+      userSelect = $('#user-search').select2({
         placeholder: "Select a trainer",
         dropdownAutoWidth : true,
         width: 'auto',
@@ -582,6 +583,16 @@ function selectUser(id) {
 		$(element).addClass("badge-primary");
 		$(element).append("<i class=\"fa fa-times lucky-user-icon\"></i>");
 	  }
+	  // Update the user dropdown on the other page
+	  if (userSelect!=null) {
+		  userSelect.val(null).trigger('change');
+		  userSelect.select2('destroy');
+		  userSelect.off('select2:select');
+		  userSelect.html('<option></option>');
+		  $("#user-pokemon").html("");
+		  $("#lucky-user-searchbox").val("");
+	  }
+	  initUser();
 	},
 	error: function (result) {
 	  errorPage("Failed to update friendship", result);
