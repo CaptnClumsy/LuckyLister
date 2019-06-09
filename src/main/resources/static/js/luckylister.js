@@ -546,7 +546,7 @@ function getUserHtml(id, name, friends) {
   if (friends) {
     userClass = "badge-success";
   }
-  var str = "<button id=\"user-" + id + "\" class=\"badge " + userClass + " lucky-user-cell\"" +
+  var str = "<button id=\"friend-" + id + "\" class=\"badge " + userClass + " lucky-user-cell\"" +
     " onclick=\"selectUser(" + id + ")\">";
   str += name;
   if (friends) {
@@ -560,7 +560,7 @@ function getUserHtml(id, name, friends) {
 
 function selectUser(id) {
   // find out if already selected  
-  var element = "#user-" + id;
+  var element = "#friend-" + id;
   var selected = $(element).hasClass("badge-success");
   var data = {
     friends: !selected
