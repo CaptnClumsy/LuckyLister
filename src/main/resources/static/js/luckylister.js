@@ -78,6 +78,7 @@ function showView(view) {
 		$("#lucky-pokemon-page").hide();
 		$("#lucky-leader-page").hide();
 		$("#lucky-friends-page").show();
+		showFriendsPage();
 	}
 	resize();
 }
@@ -103,10 +104,28 @@ function initUser() {
     contentType: "application/json; charset=utf-8",
     url: "/user/all",
     success: function (data) {
+      var postData = $.map(data, function (obj) {
+    	var newObj = {
+          id: obj.id,
+          text: obj.displayName,
+          selected: false,
+          friends: obj.friends
+    	}
+        return newObj;
+      });
       $('#user-search').select2({
         placeholder: "Select a trainer",
-        width: '90%',
-        data: data
+        dropdownAutoWidth : true,
+        width: 'auto',
+        data: postData,
+        templateResult: function(data) {
+          var userClass = "badge-primary";
+          if (data.friends!==undefined && data.friends==true) {
+        	  userClass = "badge-success";
+          }
+          var element = $("<button class=\"badge " + userClass + " lucky-user-menu-item\">"+data.text+"</button>");
+          return element;
+        }
       });
       $('#user-search').on("select2:select", function(e) {
     	  $("#user-pokemon-header").show();
@@ -170,8 +189,12 @@ function showUsersForPokemon(id) {
 	var str = "";
 	if (data.length!=0) {
 	  for (var i=0; i<data.length; i++) {
-	    str += "<span id=\"user-" + data[i].id + "\" class=\"badge badge-primary lucky-user-cell\">";
-	    str += data[i].text;
+		var userClass = "badge-primary";
+		if (data[i].friends==true) {
+			userClass = "badge-success";
+		}
+	    str += "<span id=\"user-" + data[i].id + "\" class=\"badge " + userClass + " lucky-user-cell\">";
+	    str += data[i].displayName;
 	    str += "</span>\n";
 	  }
 	} else {
@@ -501,4 +524,67 @@ function setContentHeight(id, height) {
 }
 
 function friends() {
+  $("#lucky-nav-group .btn").removeClass("active");
+  showView("FRIENDS");
+}
+
+function showFriendsPage() {
+  $.get("/user/friends", function(data) {
+    $("#lucky-friends").html("");
+	var str = "";
+	for (var i=0; i<data.length; i++) {
+	  str += getUserHtml(data[i].id, data[i].displayName, data[i].friends);
+	}
+	$("#lucky-friends").html(str);
+	resize();
+  });
+}
+
+function getUserHtml(id, name, friends) {
+  var userClass = "badge-primary";
+  if (friends) {
+    userClass = "badge-success";
+  }
+  var str = "<button id=\"user-" + id + "\" class=\"badge " + userClass + " lucky-user-cell\"" +
+    " onclick=\"selectUser(" + id + ")\">";
+  str += name;
+  if (friends) {
+    str += "<i class=\"fa fa-check lucky-user-icon\"></i>";
+  } else {
+	str += "<i class=\"fa fa-times lucky-user-icon\"></i>";
+  }
+  str += "</button>\n";
+  return str;
+}
+
+function selectUser(id) {
+  // find out if already selected  
+  var element = "#user-" + id;
+  var selected = $(element).hasClass("badge-success");
+  var data = {
+    friends: !selected
+  }
+  // update it
+  $.ajax({
+	type: "POST",
+	contentType: "application/json; charset=utf-8",
+	url: "/user/friend/"+id,
+	data: JSON.stringify(data),
+	success: function (data) {
+	  // Update the UI
+	  $(element+" i").remove();
+	  if (data.friends===true) {
+	    $(element).removeClass("badge-primary");
+	    $(element).addClass("badge-success");
+	    $(element).append("<i class=\"fa fa-check lucky-user-icon\"></i>");
+	  } else {
+		$(element).removeClass("badge-success");
+		$(element).addClass("badge-primary");
+		$(element).append("<i class=\"fa fa-times lucky-user-icon\"></i>");
+	  }
+	},
+	error: function (result) {
+	  errorPage("Failed to update friendship", result);
+	}
+  });
 }

@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,12 +14,16 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.clumsy.luckylister.data.FriendDao;
 import com.clumsy.luckylister.data.LeaderDao;
 import com.clumsy.luckylister.data.TotalDao;
+import com.clumsy.luckylister.data.UserDao;
+import com.clumsy.luckylister.entities.FriendEntity;
 import com.clumsy.luckylister.entities.LeaderEntity;
 import com.clumsy.luckylister.entities.UserEntity;
 import com.clumsy.luckylister.exceptions.UserAlreadyRegisteredException;
 import com.clumsy.luckylister.exceptions.UserNotFoundException;
+import com.clumsy.luckylister.repos.FriendRepo;
 import com.clumsy.luckylister.repos.UserRepo;
 
 @Service
@@ -27,10 +32,12 @@ public class UserService {
 	private static final Long DEFAULT_USERID = 0L;
 
 	private final UserRepo userRepo;
+	private final FriendRepo friendRepo;
 	
 	@Autowired
-	UserService(final UserRepo userRepo) {
+	UserService(final UserRepo userRepo, final FriendRepo friendRepo) {
 		this.userRepo = userRepo;
+		this.friendRepo = friendRepo;
 	}
 	
 	@Transactional(readOnly = true)
@@ -75,12 +82,27 @@ public class UserService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<UserEntity> getAllUsers() throws UserNotFoundException {
+	public List<UserDao> getAllUsers(UserEntity user) throws UserNotFoundException {
 		List<UserEntity> users = userRepo.findAll();
 		if (users == null) {
 			throw new UserNotFoundException("No users found");
 		}
-		return users;
+		final Set<Long> allFriends = friendRepo.findAllByUser(user.getId());
+		List<UserDao> userDaos = new ArrayList<>(users.size());
+		for (UserEntity thisUser : users) {
+			UserDao userDao = UserDao.fromEntity(thisUser);
+			if (allFriends!=null && allFriends.contains(thisUser.getId())) {
+				userDao.setFriends(true);
+			}
+			userDaos.add(userDao);
+		}
+		Collections.sort(userDaos, (u1, u2) -> {
+			if (u1.isFriends() == u2.isFriends()) {
+				return u1.getDisplayName().compareTo(u2.getDisplayName());
+			}
+			return (u1.isFriends() ? -1 : 1);
+		});
+		return userDaos;
 	}
 
 	@Transactional(readOnly = true)
@@ -112,12 +134,70 @@ public class UserService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<UserEntity> getAllUsersWithPokemon(Long pokemonId) {
-		List<UserEntity> users = userRepo.findAllByPokemonId(pokemonId);
+	public List<UserDao> getAllUsersWithPokemon(UserEntity user, Long pokemonId) {
+		final List<UserEntity> users = userRepo.findAllByPokemonId(pokemonId);
 		if (users == null) {
-			users = Collections.emptyList();
+			return Collections.emptyList();
 		}
-		return users;
+		final Set<Long> allFriends = friendRepo.findAllByUser(user.getId());
+		List<UserDao> userDaos = new ArrayList<>(users.size());
+		for (UserEntity thisUser : users) {
+			UserDao userDao = UserDao.fromEntity(thisUser);
+			if (allFriends!=null && allFriends.contains(thisUser.getId())) {
+				userDao.setFriends(true);
+			}
+			userDaos.add(userDao);
+		}
+		Collections.sort(userDaos, (u1, u2) -> {
+			if (u1.isFriends() == u2.isFriends()) {
+				return u1.getDisplayName().compareTo(u2.getDisplayName());
+			}
+			return (u1.isFriends() ? -1 : 1);
+		});
+		return userDaos;
+	}
+
+	@Transactional
+	public FriendDao updateFriend(UserEntity user, Long friendId, boolean friends) throws UserNotFoundException {
+		UserEntity friendUserEntity = userRepo.getOne(friendId);
+		if (friendUserEntity==null) {
+			throw new UserNotFoundException("Specified user does not exist");
+		}
+		final FriendEntity friendEntity = friendRepo.findFriend(user.getId(), friendId);
+		final FriendDao friendDao = FriendDao.fromEntity(friendUserEntity, friends);
+
+		if (!friends) {
+			// delete the row
+			if (friendEntity!=null) {
+		        friendRepo.delete(friendEntity);
+			}
+			return friendDao;
+		} 
+
+		// check if already selected
+		if (friendEntity!=null) {    
+	        return friendDao;
+		}
+		// newly selected so we need to add a row
+		final FriendEntity newEntity = new FriendEntity();
+		newEntity.setFriendid(friendId);
+		newEntity.setUserid(user.getId());
+		friendRepo.save(newEntity);
+		return friendDao;
+	}
+
+	public List<FriendDao> getAllUsersAndFriends(UserEntity user) {
+		final List<UserEntity> allUsers = userRepo.findAll();
+		final Set<Long> allFriends = friendRepo.findAllByUser(user.getId());
+		final List<FriendDao> friendDaos = new ArrayList<>(allUsers.size());
+		for (UserEntity thisUser : allUsers) {
+			boolean friends = false;
+			if (allFriends!=null && allFriends.contains(thisUser.getId())) {
+				friends = true;
+			}
+			friendDaos.add(FriendDao.fromEntity(thisUser, friends));
+		}
+		return friendDaos;
 	}
 
 }

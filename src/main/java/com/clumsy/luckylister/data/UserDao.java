@@ -11,6 +11,7 @@ public class UserDao {
 	private String name;
 	private String displayName;
 	private boolean admin;
+	private boolean friends;
 
 	public UserDao() {
 	}
@@ -21,6 +22,7 @@ public class UserDao {
 		this.name=name;
 		this.displayName=displayName;
 		this.admin=admin;
+		this.friends=false;
 	}
 
 	public static UserDao fromEntity(UserEntity user) {

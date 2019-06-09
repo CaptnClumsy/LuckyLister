@@ -27,3 +27,12 @@ create table user_lucky_pokemon (
 
 create index ulp_by_user on user_lucky_pokemon(userid);
 create unique index on user_lucky_pokemon(userid, pokemonid);
+
+create table friends (
+  id bigint not null,
+  userid bigint not null references users(id),
+  friendid bigint not null references users(id),
+  primary key (id)
+);
+
+create index friends_by_user on friends(userid);
