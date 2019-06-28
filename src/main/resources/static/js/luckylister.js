@@ -145,11 +145,17 @@ function showUserPokemon(id) {
 	var width = getImageSize("#user-pokemon");
     $("#user-pokemon").html("");
 	var str = "";
-	for (var i=0; i<data.length; i++) {
-	  str += "<button id=\"user-pokemon-" + data[i].id + "\" class=\"lucky-cell\">";
-	  str += getCellHtml(data[i], width);
-	  str += "</button>\n";
-	}
+	if (data.length!=0) {
+	  for (var i=0; i<data.length; i++) {
+	    str += "<button id=\"user-pokemon-" + data[i].id + "\" class=\"lucky-cell\">";
+	    str += getCellHtml(data[i], width);
+	    str += "</button>\n";
+	  }
+    } else {
+		str="<div class=\"jumbotron lucky-professor-jumbo\">" +
+		  "<p class=\"lead\">This trainer is a Pokemon master...they have got them all!</p>" +
+		  "<div class=\"lucky-professor\"></div></div>";
+	} 
 	$("#user-pokemon").html(str);
 	resize();
   });
@@ -350,29 +356,44 @@ function filterPokemon(filter) {
   // Declare variables
   var input, filterText, grid, cells, label, i, txtValue;
   input = document.getElementById("lucky-searchbox");
-  filterText = input.value.toUpperCase();
+  filterText = input.value.toUpperCase().trim();
   grid = document.getElementById("pokemon");
   cells = grid.getElementsByClassName("lucky-cell");
   
   // Loop through all grid rows, and hide those who don't match the search query
+  var need = 0;
   for (i = 0; i < cells.length; i++) {
     label = cells[i].getElementsByClassName("lucky-cell-label")[0];
-	if (label) {
-	  txtValue = label.textContent || label.innerText;
-	  if (txtValue.toUpperCase().indexOf(filterText) > -1) {
-	    if (filter=="ALL") {
-	      cells[i].style.display = "";
-	    } else if (filter=="NEED" && label.classList.contains("lucky-need")) {
-	      cells[i].style.display = "";
-	    } else if (filter=="GOT" && !label.classList.contains("lucky-need")) {
-	      cells[i].style.display = "";
-	    } else {
-	      cells[i].style.display = "none";
-	    }
+	if (!label) {
+		continue;
+	}
+	txtValue = label.textContent || label.innerText;
+	if (label.classList.contains("lucky-need")) {
+		need++;
+	}
+	if (txtValue.toUpperCase().indexOf(filterText) > -1) {
+	  if (filter=="ALL") {
+	    cells[i].style.display = "";
+	  } else if (filter=="NEED" && label.classList.contains("lucky-need")) {
+	    cells[i].style.display = "";
+	  } else if (filter=="GOT" && !label.classList.contains("lucky-need")) {
+	    cells[i].style.display = "";
 	  } else {
 	    cells[i].style.display = "none";
 	  }
+	} else {
+	  cells[i].style.display = "none";
 	}
+  }
+  if (filter=="NEED" && need==0) {
+    var str="<div class=\"jumbotron lucky-professor-jumbo\">" +
+	  "<p class=\"lead\">You are a Pokemon master! You have got all the lucky Pokemon.</p>" +
+	  "<div class=\"lucky-professor\"></div></div>";
+    $('#got-them-all').html(str);
+    $('#got-them-all').css("display","");
+  } else {
+	$('#got-them-all').html("");
+	$('#got-them-all').css("display","none");
   }
 }
 
@@ -493,7 +514,7 @@ function resize() {
   // resize home page
   var gridHeader = document.getElementById("lucky-grid-header");
   var gridHeaderHeight = gridHeader.offsetHeight;
-  setContentHeight("pokemon", headerHeight+gridHeaderHeight);
+  setContentHeight("grid-container", headerHeight+gridHeaderHeight);
   
   // resize user page
   var helpHeader = document.getElementById("lucky-user-help");

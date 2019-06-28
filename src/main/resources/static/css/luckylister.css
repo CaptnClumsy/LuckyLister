@@ -260,6 +260,8 @@ body {
 .lucky-professor-jumbo {
     padding: 8px;
     height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 .lucky-user-icon {
 	margin-left: 10px;
