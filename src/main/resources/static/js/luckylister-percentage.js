@@ -2,7 +2,7 @@ function drawPercentage(parentElement, size, lineWidth, amount, total, bgColour,
 	// Work out the percentage
 	var percent = 0;
    	if (total != 0) {
-   		percent = Math.round((amount / total) * 100);
+   		percent = Math.floor((amount / total) * 100);
     }
     // Create the canvas
    	var canvas = document.createElement('canvas');
