@@ -90,8 +90,6 @@ insert into pokemon (id,genid,dexid,costume,region, name, available, shiny) valu
 
 insert into pokemon (id,genid,dexid,costume,region, name, available, shiny) values (nextval('pokemonids'),1,26,0,61,'Raichu',true,true);
 
-insert into pokemon (id,genid,dexid,costume,region, name, available, shiny) values (nextval('pokemonids'),1,25,1,0,'Pikachu',true,true);
-
 insert into pokemon (id,genid,dexid,costume,region, name, available, shiny) values (nextval('pokemonids'),1,27,0,0,'Sandshrew',true,true);
 
 insert into pokemon (id,genid,dexid,costume,region, name, available, shiny) values (nextval('pokemonids'),1,28,0,0,'Sandslash',true,true);
