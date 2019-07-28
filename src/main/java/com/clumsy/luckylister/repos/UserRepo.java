@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import com.clumsy.luckylister.entities.LeaderEntity;
 import com.clumsy.luckylister.entities.UserEntity;
+import com.clumsy.luckylister.entities.UserShinyCountEntity;
  
 @Repository
 public interface UserRepo extends JpaRepository<UserEntity, Long> {
@@ -16,7 +17,7 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
 	@Query("SELECT t FROM UserEntity t WHERE t.id != 0 ORDER BY t.displayName ASC")
 	List<UserEntity> findAll();
 	
-	@Query("SELECT COUNT(*) FROM PokemonEntity t WHERE t.available=true")
+	@Query("SELECT COUNT(*) FROM PokemonEntity t WHERE t.available=true AND t.shiny=false")
 	Long findTotal();
 	
 	@Query("SELECT COUNT(*) FROM UserLuckyPokemonEntity t WHERE t.userid=?1")
@@ -35,4 +36,19 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
 			  "l.pokemonid=?1) " +
 			"ORDER BY t.displayName ASC")
 	List<UserEntity> findAllByPokemonId(Long pokemonId);
+	
+	@Query("SELECT COUNT(*) FROM UserShinyPokemonEntity t WHERE t.userid=?1")
+	Long findShiny(Long userid);
+	
+	@Query("SELECT COUNT(*) FROM PokemonEntity t WHERE t.available=true AND t.shiny=true")
+	Long findShinyTotal();
+	
+	@Query("SELECT u.id AS id, u.displayName AS displayName, COUNT(*) AS total " +
+			"FROM UserEntity u, UserShinyPokemonEntity p WHERE p.userid=u.id " + 
+			"GROUP BY u.id ORDER BY total DESC, displayName DESC")
+	List<LeaderEntity> findShinyLeaders();
+	
+	@Query("SELECT l.userid AS id, COUNT(*) AS count FROM UserShinyPokemonEntity l WHERE " +
+			  "l.pokemonid IN (SELECT p.id FROM PokemonEntity p WHERE p.dexid=?1 AND p.available=true AND p.shiny=true) GROUP BY l.userid ORDER BY l.userid")
+	List<UserShinyCountEntity> findAllShinyByDexId(Long dexId);
 }

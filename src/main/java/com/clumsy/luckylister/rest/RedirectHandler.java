@@ -12,5 +12,10 @@ public class RedirectHandler {
 	public ModelAndView  login(ModelMap model) {
 	    return new ModelAndView("/", model);
     }
+	
+	@RequestMapping("/shiny/login/facebook")
+	public ModelAndView  shinyLogin(ModelMap model) {
+	    return new ModelAndView("/shiny", model);
+    }
 
 }

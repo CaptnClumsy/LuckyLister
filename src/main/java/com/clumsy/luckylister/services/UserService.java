@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,9 +23,11 @@ import com.clumsy.luckylister.data.UserDao;
 import com.clumsy.luckylister.entities.FriendEntity;
 import com.clumsy.luckylister.entities.LeaderEntity;
 import com.clumsy.luckylister.entities.UserEntity;
+import com.clumsy.luckylister.entities.UserShinyCountEntity;
 import com.clumsy.luckylister.exceptions.UserAlreadyRegisteredException;
 import com.clumsy.luckylister.exceptions.UserNotFoundException;
 import com.clumsy.luckylister.repos.FriendRepo;
+import com.clumsy.luckylister.repos.PokemonRepo;
 import com.clumsy.luckylister.repos.UserRepo;
 
 @Service
@@ -33,11 +37,13 @@ public class UserService {
 
 	private final UserRepo userRepo;
 	private final FriendRepo friendRepo;
+	private final PokemonRepo pokemonRepo;
 	
 	@Autowired
-	UserService(final UserRepo userRepo, final FriendRepo friendRepo) {
+	UserService(final UserRepo userRepo, final FriendRepo friendRepo, final PokemonRepo pokemonRepo) {
 		this.userRepo = userRepo;
 		this.friendRepo = friendRepo;
+		this.pokemonRepo = pokemonRepo;
 	}
 	
 	@Transactional(readOnly = true)
@@ -199,6 +205,66 @@ public class UserService {
 		}
 		return friendDaos;
 	}
+	
+	@Transactional(readOnly = true)
+	public TotalDao getShinyStats(UserEntity user) {
+		Long total = userRepo.findShinyTotal();
+		Long amount = userRepo.findShiny(user.getId());
+		return new TotalDao(total, amount);
+	}
 
+	@Transactional(readOnly = true)
+	public List<LeaderDao> getShinyLeaderboard(UserEntity user) {
+		final List<LeaderEntity> leaderEntities = userRepo.findShinyLeaders();
+		final List<LeaderDao> leaders = new ArrayList<>(leaderEntities.size());
+		int rank = 1;
+		for (LeaderEntity leaderEntity : leaderEntities) {
+			LeaderDao leader = new LeaderDao(rank++, leaderEntity.getDisplayName(), leaderEntity.getTotal());
+			leaders.add(leader);
+		}
+		return leaders;
+	}
+	
+	@Transactional(readOnly = true)
+	public List<UserDao> getAllUsersWithShinyPokemon(UserEntity user, Long dexId) {
+		// Find how many pokemon have this dex id
+		final Integer count = pokemonRepo.countAllShinyByDexId(dexId);
+		// Find all users
+		final List<UserEntity> allUsers = userRepo.findAll();
+		final List<UserEntity> allUsersWithout = new ArrayList<>();
+		// Find who has got this shiny and how many of them
+		final List<UserShinyCountEntity> userCountEntities = userRepo.findAllShinyByDexId(dexId);
+		final Map<Long, Integer> userCounts = userCountEntities.stream().collect(
+                Collectors.toMap(UserShinyCountEntity::getId, UserShinyCountEntity::getCount));
+		if (userCounts != null) {
+			for (UserEntity thisUser : allUsers) {
+				if (!userCounts.containsKey(thisUser.getId())) {
+					allUsersWithout.add(thisUser);
+				} else if (userCounts.get(thisUser.getId())!=count) {
+					allUsersWithout.add(thisUser);
+				}
+			}
+		} else {
+			// Everybody needs them
+			allUsersWithout.addAll(allUsers);
+		}
+		// Build list of User data objects
+		final Set<Long> allFriends = friendRepo.findAllByUser(user.getId());
+		List<UserDao> userDaos = new ArrayList<>(userCounts.size());
+		for (UserEntity thisUser : allUsersWithout) {
+			UserDao userDao = UserDao.fromEntity(thisUser);
+			if (allFriends!=null && allFriends.contains(thisUser.getId())) {
+				userDao.setFriends(true);
+			}
+			userDaos.add(userDao);
+		}
+		Collections.sort(userDaos, (u1, u2) -> {
+			if (u1.isFriends() == u2.isFriends()) {
+				return u1.getDisplayName().compareTo(u2.getDisplayName());
+			}
+			return (u1.isFriends() ? -1 : 1);
+		});
+		return userDaos;
+	}
 }
 

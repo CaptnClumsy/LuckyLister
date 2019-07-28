@@ -30,5 +30,14 @@ public class PokemonEntity {
 
 	@Column(name = "available")
 	private Boolean available;
+	
+	@Column(name = "shiny")
+	private Boolean shiny;
+	
+	@Column(name = "costume")
+	private Long costume;
+	
+	@Column(name = "region")
+	private Long region;
 
 }

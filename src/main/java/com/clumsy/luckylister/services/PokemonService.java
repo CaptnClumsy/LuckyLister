@@ -14,20 +14,25 @@ import com.clumsy.luckylister.data.SelectListDao;
 import com.clumsy.luckylister.entities.PokemonEntity;
 import com.clumsy.luckylister.entities.UserEntity;
 import com.clumsy.luckylister.entities.UserLuckyPokemonEntity;
+import com.clumsy.luckylister.entities.UserShinyPokemonEntity;
 import com.clumsy.luckylister.exceptions.ObjectNotFoundException;
 import com.clumsy.luckylister.repos.PokemonRepo;
 import com.clumsy.luckylister.repos.UserLuckyPokemonRepo;
+import com.clumsy.luckylister.repos.UserShinyPokemonRepo;
 
 @Service
 public class PokemonService {
 
 	private final PokemonRepo pokemonRepo;
 	private final UserLuckyPokemonRepo luckyPokemonRepo;
+	private final UserShinyPokemonRepo shinyPokemonRepo;
 	
 	@Autowired
-	PokemonService(final PokemonRepo pokemonRepo, final UserLuckyPokemonRepo luckyPokemonRepo) {
+	PokemonService(final PokemonRepo pokemonRepo, final UserLuckyPokemonRepo luckyPokemonRepo,
+		final UserShinyPokemonRepo shinyPokemonRepo) {
 		this.pokemonRepo = pokemonRepo;
 		this.luckyPokemonRepo = luckyPokemonRepo;
+		this.shinyPokemonRepo = shinyPokemonRepo;
 	}
 
 	@Transactional(readOnly = true)
@@ -103,5 +108,77 @@ public class PokemonService {
 			daos.add(dao);
 		}
 		return daos;
+	}
+	
+	@Transactional(readOnly = true)
+	public List<PokemonDao> listShinyPokemon(UserEntity user) {
+		final Set<Long> shinyPokemonIds = shinyPokemonRepo.findByUserId(user.getId());
+		final List<PokemonEntity> entities = pokemonRepo.findAllShiny();
+		List<PokemonDao> daos = new ArrayList<>(entities.size());
+		for (PokemonEntity entity : entities) {
+			final PokemonDao dao = PokemonDao.fromEntity(entity);
+			if (shinyPokemonIds.contains(dao.getId())) {
+				dao.setDone(true);
+			} else {
+				dao.setDone(false);
+			}
+			daos.add(dao);
+		}
+		return daos;
+	}
+	
+	@Transactional
+	public PokemonDao updateShinyPokemon(UserEntity user, Long pokemonId, boolean selected) throws ObjectNotFoundException {
+		// find if user already selected this pokemon and load the details for it		
+		final UserShinyPokemonEntity entity = shinyPokemonRepo.findByUserIdAndPokemonId(user.getId(), pokemonId);
+		final Optional<PokemonEntity> pokemonEntity = pokemonRepo.findById(pokemonId);
+		if (!pokemonEntity.isPresent()) {
+			throw new ObjectNotFoundException("Unable to find pokemon");
+		}
+		final PokemonDao dao = PokemonDao.fromEntity(pokemonEntity.get());
+		
+		if (!selected) {
+			dao.setDone(false);
+			// delete the row
+			if (entity!=null) {
+		        shinyPokemonRepo.delete(entity);
+			}
+			return dao;
+		} 
+
+		// check if already selected
+		dao.setDone(true);
+		if (entity!=null) {    
+	        return dao;
+		}
+		// newly selected so we need to add a row
+		final UserShinyPokemonEntity newEntity = new UserShinyPokemonEntity();
+		newEntity.setPokemonid(pokemonId);
+		newEntity.setUserid(user.getId());
+		shinyPokemonRepo.save(newEntity);
+		return dao;
+	}
+	
+	@Transactional(readOnly = true)
+	public List<PokemonDao> listShinyPokemonForUser(UserEntity user) {
+		final List<PokemonEntity> entities = pokemonRepo.findAllShinyForUser(user.getId());
+		List<PokemonDao> daos = new ArrayList<>(entities.size());
+		for (PokemonEntity entity : entities) {
+			final PokemonDao dao = PokemonDao.fromEntity(entity);
+			dao.setDone(false);
+			daos.add(dao);
+		}
+		return daos;
+	}
+	
+	@Transactional(readOnly = true)
+	public PokemonDao getPokemon(Long pokemonId) throws ObjectNotFoundException {
+		final Optional<PokemonEntity> entity = pokemonRepo.findById(pokemonId);
+		if (!entity.isPresent()) {
+			throw new ObjectNotFoundException("Unable to find Pokemon");
+		}
+		final PokemonDao dao = PokemonDao.fromEntity(entity.get());
+		dao.setDone(false);
+		return dao;
 	}
 }

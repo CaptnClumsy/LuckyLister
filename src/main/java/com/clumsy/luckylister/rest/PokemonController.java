@@ -93,4 +93,51 @@ public class PokemonController {
 			throw new ObjectNotFoundException("No Pokemon found");
 		}
     }
+	
+	@RequestMapping("/shiny/pokemon")
+	public List<PokemonDao> listShinyPokemon(Principal principal) {
+		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+		try {
+			UserEntity user = userService.getCurrentUser(principal);
+			List<PokemonDao> pokemon = pokemonService.listShinyPokemon(user);
+			return pokemon;
+		} catch (UserNotFoundException e) {
+			throw new ObjectNotFoundException("Current user not found");
+		} catch (UserAlreadyRegisteredException e) {
+			throw new UserServiceException(e.getMessage());
+		}
+    }
+	
+	@RequestMapping(value = "/shiny/pokemon/{id}", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public PokemonDao updateShinyPokemon(@RequestBody UpdatePokemonDao updateData, @PathVariable("id") Long pokemonId, Principal principal) {
+    	if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+		try {
+			final UserEntity user = userService.getCurrentUser(principal);
+            final PokemonDao dao = pokemonService.updateShinyPokemon(user, pokemonId, updateData.isSelected());
+            return dao;
+		} catch (UserNotFoundException e) {
+			throw new ObjectNotFoundException("Current user not found");
+		} catch (UserAlreadyRegisteredException e) {
+			throw new UserServiceException(e.getMessage());
+		}
+    }
+	
+	@RequestMapping("/shiny/pokemon/user/{id}")
+	public List<PokemonDao> listShinyPokemonForUser(@PathVariable("id") Long userId, Principal principal) {
+		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+		try {
+			UserEntity user = userService.getUser(userId);
+			List<PokemonDao> pokemon = pokemonService.listShinyPokemonForUser(user);
+			return pokemon;
+		} catch (UserNotFoundException e) {
+			throw new ObjectNotFoundException("User not found");
+		}
+    }
 }

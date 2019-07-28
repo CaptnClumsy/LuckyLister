@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.clumsy.luckylister.data.FriendDao;
 import com.clumsy.luckylister.data.LeaderDao;
+import com.clumsy.luckylister.data.PokemonDao;
 import com.clumsy.luckylister.data.TotalDao;
 import com.clumsy.luckylister.data.UpdateFriendDao;
 import com.clumsy.luckylister.data.UserDao;
@@ -24,6 +25,7 @@ import com.clumsy.luckylister.exceptions.ObjectNotFoundException;
 import com.clumsy.luckylister.exceptions.UserAlreadyRegisteredException;
 import com.clumsy.luckylister.exceptions.UserNotFoundException;
 import com.clumsy.luckylister.exceptions.UserServiceException;
+import com.clumsy.luckylister.services.PokemonService;
 import com.clumsy.luckylister.services.UserService;
 
 @RestController
@@ -31,6 +33,9 @@ public class UserController {
 
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private PokemonService pokemonService;
 
 	@RequestMapping("/user")
 	public UserDao user(Principal principal) {
@@ -137,6 +142,54 @@ public class UserController {
 			throw new ObjectNotFoundException("Current user not found");
 		} catch (UserAlreadyRegisteredException e) {
 			throw new UserServiceException(e.getMessage());
+		}
+    }
+	
+	@RequestMapping("/shiny/user/stats")
+	public TotalDao luckyStats(Principal principal) {
+		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+		try {
+			UserEntity user = userService.getCurrentUser(principal);
+			TotalDao stats = userService.getShinyStats(user);
+			return stats;
+		} catch (UserNotFoundException e) {
+			throw new ObjectNotFoundException("Current user not found");
+		} catch (UserAlreadyRegisteredException e) {
+			throw new UserServiceException(e.getMessage());
+		}
+    }
+	
+	@RequestMapping(value = "/shiny/user/leaderboard")
+    public List<LeaderDao> getShinyLeaderboard(Principal principal) {
+    	if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+    	try {
+    	    UserEntity user = userService.getCurrentUser(principal);
+		    return userService.getShinyLeaderboard(user);
+    	} catch (UserNotFoundException e) {
+    		throw new ObjectNotFoundException("Current user not found");
+    	} catch (UserAlreadyRegisteredException e) {
+    		throw new UserServiceException(e.getMessage());
+		}
+	}
+	
+	@RequestMapping("/shiny/user/pokemon/{id}")
+	public List<UserDao> usersShiny(@PathVariable("id") Long pokemonId, Principal principal) {
+		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+		try {
+			UserEntity user = userService.getCurrentUser(principal);
+			PokemonDao p = pokemonService.getPokemon(pokemonId);
+			List<UserDao> users = userService.getAllUsersWithShinyPokemon(user, p.getDexid());
+			return users;
+		} catch (UserNotFoundException e) {
+    		throw new ObjectNotFoundException("Current user not found");
+    	} catch (UserAlreadyRegisteredException e) {
+    		throw new UserServiceException(e.getMessage());
 		}
     }
 }

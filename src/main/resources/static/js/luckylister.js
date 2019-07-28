@@ -1,7 +1,13 @@
 var leadersTable = null;
 var userSelect = null;
+var page_mode = "";
+var api_url = "";
 
-function initPage() {
+function initPage(mode) {
+  if (mode!="lucky") {
+	  page_mode = mode;
+	  api_url = "/" + mode;
+  }
   $.ajaxSetup({
     beforeSend : function(xhr, settings) {
       if (settings.type == 'POST' || settings.type == 'PUT'
@@ -141,7 +147,7 @@ function initUser() {
 }
 
 function showUserPokemon(id) {
-  $.get("/pokemon/user/"+id, function(data) {
+  $.get(api_url+"/pokemon/user/"+id, function(data) {
 	var width = getImageSize("#user-pokemon");
     $("#user-pokemon").html("");
 	var str = "";
@@ -191,7 +197,7 @@ function showPokemonPage() {
 }
 
 function showUsersForPokemon(id) {
-  $.get("/user/pokemon/"+id, function(data) {
+  $.get(api_url+"/user/pokemon/"+id, function(data) {
 	$("#question-users").html("");
 	var str = "";
 	if (data.length!=0) {
@@ -215,7 +221,7 @@ function showUsersForPokemon(id) {
 }
 
 function showHome() {
-  $.get("/pokemon", function(data) {
+  $.get(api_url+"/pokemon", function(data) {
 	var width = getImageSize("#pokemon");
     $("#pokemon").html("");
     var str = "";
@@ -245,7 +251,7 @@ function selectPokemon(id) {
   $.ajax({
     type: "POST",
 	contentType: "application/json; charset=utf-8",
-	url: "pokemon/"+id,
+	url: api_url+"/pokemon/"+id,
 	data: JSON.stringify(data),
 	success: function (data) {
 	  // Update the UI
@@ -284,17 +290,45 @@ function getCellHtml(data, width) {
   return str;
 }
 
-function getImageUrl(data) {
-  var iconId = "";
-  if (data.dexid<10) {
-    iconId = "00" + data.dexid;
-  } else if (data.dexid<100) {
-    iconId = "0" + data.dexid;
+function padNumber3(val) {
+  var res = "";
+  if (val<10) {
+    res = "00" + val;
+  } else if (val<100) {
+	res = "0" + val;
   } else {
-    iconId = data.dexid;
+	res = val;
+  }	
+  return res;
+}
+
+function padNumber2(val) {
+  var res = "";
+  if (val<10) {
+    res = "0" + val;
+  } else {
+	res = val;
+  }	
+  return res;
+}
+	
+function getImageUrl(data) {
+  var iconId = padNumber3(data.dexid);
+  var regionId = padNumber2(data.region);
+  var costumeId = padNumber2(data.costume);
+  var image_url = "";
+  if (page_mode=="shiny") {
+    image_url = "images/shiny/";
+  } else {
+	image_url = "images/";
   }
-  image_url = "images/" + 
-	"pokemon_icon_" + iconId + "_00";
+  image_url += "pokemon_icon_" + iconId + "_" + regionId;
+  if (costumeId!="00") {
+	  image_url += "_" + costumeId;
+  }
+  if (page_mode=="shiny") {
+	  image_url += "_shiny";
+  }
   if (data.done!==true) {
 	  image_url += "_d";
   }
@@ -386,9 +420,13 @@ function filterPokemon(filter) {
 	}
   }
   if (filter=="NEED" && need==0) {
-    var str="<div class=\"jumbotron lucky-professor-jumbo\">" +
-	  "<p class=\"lead\">You are a Pokemon master! You have got all the lucky Pokemon.</p>" +
-	  "<div class=\"lucky-professor\"></div></div>";
+    var str="<div class=\"jumbotron lucky-professor-jumbo\">";
+    if (page_mode=="lucky") {
+	  str += "<p class=\"lead\">You are a Pokemon master! You have got all the lucky Pokemon.</p>";
+    } else {
+      str += "<p class=\"lead\">You are a Pokemon master! You have got all the shiny Pokemon.</p>";	
+    }
+	str += "<div class=\"lucky-professor\"></div></div>";
     $('#got-them-all').html(str);
     $('#got-them-all').css("display","");
   } else {
@@ -398,7 +436,7 @@ function filterPokemon(filter) {
 }
 
 function resetPercentage() {
-  $.get("/user/stats", function(data) {
+  $.get(api_url+"/user/stats", function(data) {
 	  var colors = getPercentageColors();
 	  // Clear previous percentage
 	  $('#lucky-gold-percent').html('');
@@ -423,7 +461,7 @@ function showLeaderboard() {
   $.ajax({
     type: "GET",
     contentType: "application/json; charset=utf-8",
-    url: "/user/leaderboard",
+    url: api_url+"/user/leaderboard",
     success: function (data) {
       resetLeadersTable();
       $('#leadersTableBody').html("");

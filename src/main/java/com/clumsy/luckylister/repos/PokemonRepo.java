@@ -12,9 +12,19 @@ import com.clumsy.luckylister.entities.PokemonEntity;
 public interface PokemonRepo extends JpaRepository<PokemonEntity, Long> {
 	PokemonEntity findOneByName(String name);
 
-	@Query("SELECT t FROM PokemonEntity t WHERE t.available=true AND t.id NOT IN (SELECT t1.pokemonid FROM UserLuckyPokemonEntity t1 WHERE t1.userid=?1) ORDER BY t.dexid ASC")
+	@Query("SELECT t FROM PokemonEntity t WHERE t.available=true AND t.shiny=false AND t.id NOT IN (SELECT t1.pokemonid FROM UserLuckyPokemonEntity t1 WHERE t1.userid=?1) ORDER BY t.dexid ASC")
 	List<PokemonEntity> findAllForUser(Long userId);
 	
-	@Query("SELECT t FROM PokemonEntity t WHERE t.available=true ORDER BY t.dexid ASC")
+	@Query("SELECT t FROM PokemonEntity t WHERE t.available=true AND t.shiny=false ORDER BY t.dexid ASC")
 	List<PokemonEntity> findAll();
+
+	@Query("SELECT t FROM PokemonEntity t WHERE t.available=true AND t.shiny=true ORDER BY t.dexid ASC, t.region ASC, t.costume ASC")
+	List<PokemonEntity> findAllShiny();
+	
+	@Query("SELECT t FROM PokemonEntity t WHERE t.available=true AND t.shiny=true AND t.id NOT IN (SELECT t1.pokemonid FROM UserShinyPokemonEntity t1 "
+			+ "WHERE t1.userid=?1) ORDER BY t.dexid ASC, t.region ASC, t.costume ASC")
+	List<PokemonEntity> findAllShinyForUser(Long userId);
+	
+	@Query("SELECT COUNT(*) FROM PokemonEntity t WHERE t.available=true AND t.shiny=true AND t.dexid=?1")
+	Integer countAllShinyByDexId(Long dexId);
 }
