@@ -34,6 +34,11 @@ body {
     padding-top: 0px;
     margin-right: 4px;
 }
+.lucky-mode-menu {
+	width: 218px;
+    top: 85%;
+    left: 4px;
+}
 .lucky-navbar-right {
 	justify-content: flex-end;
 }

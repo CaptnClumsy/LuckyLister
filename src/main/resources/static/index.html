@@ -34,10 +34,16 @@
   <body>
     <nav id ="lucky-nav-outer" class="navbar navbar-expand-sm navbar-static-top navbar-dark bg-primary lucky-top-nav">
       <div class="lucky-left-nav">
-        <a class="navbar-brand lucky-navbar-title" href="/tos.html">
-          <img src="/images/clover.png" width="30" height="30" class="d-inline-block align-text-bottom" alt="">
+        <button class="dropdown-toggle btn btn-primary navbar-brand lucky-navbar-title lucky-nav-dropdown" type="button" id="navbar-title" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <img src="/images/clover.png" class="d-inline-block align-text-bottom" alt="" width="30" height="30">
           LuckyLister
-        </a>
+        </button>
+        <div class="bg-primary dropdown-menu lucky-mode-menu" aria-labelledby="navbar-title">
+          <a class="btn navbar-brand lucky-navbar-title" id="navbar-shiny" href="/shiny">
+            <img src="/images/shiny.png" class="d-inline-block align-text-bottom" alt="" width="30" height="30">
+            ShinyLister
+          </a>
+        </div>
         <div id="lucky-gold-percent" class="authenticated lucky-nav-percent" style="display: none;">
         </div>
       </div>
@@ -77,6 +83,7 @@
               <button class="dropdown-toggle btn btn-primary lucky-nav-dropdown" type="button" id="user" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               </button>
               <div class="dropdown-menu lucky-user-menu" aria-labelledby="user">
+                <a class="btn btn-default dropdown-item" href="/tos.html">About</a>
                 <button class="dropdown-item" onClick="friends()">Friends</button>
                 <button class="dropdown-item" onClick="logout()">Logout</button>
               </div>
