@@ -2,6 +2,8 @@ var leadersTable = null;
 var userSelect = null;
 var page_mode = "";
 var api_url = "";
+var current_view = "HOME";
+var include_hats = true;
 
 function initPage(mode) {
   if (mode!="lucky") {
@@ -47,8 +49,17 @@ function initPage(mode) {
 
 function initNavbar() {
   $('#lucky-nav-group .btn').on('click', function(event) {
-    var val = $(this).find('input').val();
-	showView(val);
+    current_view = $(this).find('input').val();
+	showView(current_view);
+  });
+  $('#lucky-hat-btn').on('click', function(event) {
+	var val = $(this).hasClass('active');
+	include_hats=!val;
+	if (current_view=="HOME") {
+		showHome();
+	} else if (current_view=="USER") {
+		showUser();
+	}
   });
 }
 
@@ -59,12 +70,14 @@ function showView(view) {
 		$("#lucky-leader-page").hide();
 		$("#lucky-friends-page").hide();
 		$("#lucky-home-page").show();
+		showHome();
 	} else if (view==="USER") {
 		$("#lucky-home-page").hide();
 		$("#lucky-pokemon-page").hide();
 		$("#lucky-leader-page").hide();
 		$("#lucky-friends-page").hide();
 		$("#lucky-user-page").show();
+		showUser();
 	} else if (view==="POKEMON") {
 		$("#lucky-home-page").hide();
 		$("#lucky-user-page").hide();
@@ -146,6 +159,13 @@ function initUser() {
   });
 }
 
+function showUser() {
+  var data = $('#user-search').select2('data');
+  if (data!==undefined && data.length!=0 && data[0].id!="") {
+    showUserPokemon(data[0].id);
+  }
+}
+
 function showUserPokemon(id) {
   $.get(api_url+"/pokemon/user/"+id, function(data) {
 	var width = getImageSize("#user-pokemon");
@@ -153,6 +173,9 @@ function showUserPokemon(id) {
 	var str = "";
 	if (data.length!=0) {
 	  for (var i=0; i<data.length; i++) {
+		if (!include_hats && data[i].costume!==0) {
+	      continue;
+	    }
 	    str += "<button id=\"user-pokemon-" + data[i].id + "\" class=\"lucky-cell\">";
 	    str += getCellHtml(data[i], width);
 	    str += "</button>\n";
@@ -163,6 +186,7 @@ function showUserPokemon(id) {
 		  "<div class=\"lucky-professor\"></div></div>";
 	} 
 	$("#user-pokemon").html(str);
+	searchUserPokemon();
 	resize();
   });
 }
@@ -226,6 +250,9 @@ function showHome() {
     $("#pokemon").html("");
     var str = "";
     for (var i=0; i<data.length; i++) {
+      if (!include_hats && data[i].costume!==0) {
+    	  continue;
+      }
       str += "<button id=\"pokemon-" + data[i].id + "\" class=\"lucky-cell\" ";
       if (data[i].available===true) {
         str+= "onclick=\"selectPokemon(" + data[i].id + ")\"";
@@ -235,6 +262,7 @@ function showHome() {
       str += "</button>\n";
     }
     $("#pokemon").html(str);
+    searchPokemon();
     resetPercentage();
     resize();
   });
