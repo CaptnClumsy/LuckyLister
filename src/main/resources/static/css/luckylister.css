@@ -37,7 +37,7 @@ body {
 }
 .lucky-mode-menu {
 	width: 170px;
-    top: 80%;
+    top: 50px;
     left: 4px;
 }
 .lucky-navbar-right {
@@ -71,6 +71,9 @@ body {
 }
 .lucky-hat-btn .active {
 	color: white;
+}
+.lucky-nav-gap {
+	margin-top: 6px;
 }
 .lucky-login-button {
 	background-color: #4267b2;
