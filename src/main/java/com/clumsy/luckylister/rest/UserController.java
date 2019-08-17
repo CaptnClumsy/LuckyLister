@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.clumsy.luckylister.data.FriendDao;
 import com.clumsy.luckylister.data.LeaderDao;
 import com.clumsy.luckylister.data.PokemonDao;
+import com.clumsy.luckylister.data.PrefsDao;
 import com.clumsy.luckylister.data.TotalDao;
 import com.clumsy.luckylister.data.UpdateFriendDao;
 import com.clumsy.luckylister.data.UserDao;
@@ -42,6 +43,23 @@ public class UserController {
 		try {
 			UserEntity user = userService.getCurrentUser(principal);
 			return UserDao.fromEntity(user);
+		} catch (UserNotFoundException e) {
+			throw new ObjectNotFoundException("Current user not found");
+		} catch (UserAlreadyRegisteredException e) {
+			throw new UserServiceException(e.getMessage());
+		}
+    }
+	
+	@RequestMapping(value = "/user/prefs", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public UserDao updateUser(@RequestBody PrefsDao updateData, Principal principal) {
+    	if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+		try {
+			final UserEntity user = userService.getCurrentUser(principal);
+            final UserDao dao = userService.updateUser(user, updateData.isCostumes());
+            return dao;
 		} catch (UserNotFoundException e) {
 			throw new ObjectNotFoundException("Current user not found");
 		} catch (UserAlreadyRegisteredException e) {

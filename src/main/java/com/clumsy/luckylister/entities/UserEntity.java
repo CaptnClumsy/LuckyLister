@@ -28,4 +28,6 @@ public class UserEntity {
 	@Column(name = "admin")
 	private Boolean admin;
 
+	@Column(name = "costumes")
+	private Boolean costumes;
 }

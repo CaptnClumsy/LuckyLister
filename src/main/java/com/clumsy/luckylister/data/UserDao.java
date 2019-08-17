@@ -12,22 +12,24 @@ public class UserDao {
 	private String displayName;
 	private boolean admin;
 	private boolean friends;
+	private boolean costumes;
 
 	public UserDao() {
 	}
 	
 	public UserDao(final Long id, final String name, final String displayName,
-		final boolean admin) {
+		final boolean admin, final boolean costumes) {
 		this.id=id;
 		this.name=name;
 		this.displayName=displayName;
 		this.admin=admin;
 		this.friends=false;
+		this.costumes=costumes;
 	}
 
 	public static UserDao fromEntity(UserEntity user) {
 		return new UserDao(user.getId(), user.getName(), user.getDisplayName(),
-			user.getAdmin());
+			user.getAdmin(), user.getCostumes());
 	}
 
 }

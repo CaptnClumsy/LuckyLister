@@ -80,6 +80,7 @@ public class UserService {
 			newUser.setName(principal.getName());
 			newUser.setDisplayName(displayName);
 			newUser.setAdmin(false);
+			newUser.setCostumes(true);
 			
 			UserEntity savedUser = userRepo.save(newUser);
 			return savedUser;
@@ -265,6 +266,14 @@ public class UserService {
 			return (u1.isFriends() ? -1 : 1);
 		});
 		return userDaos;
+	}
+
+	@Transactional
+	public UserDao updateUser(UserEntity user, boolean costumes) throws UserNotFoundException {
+		UserEntity myUserEntity = userRepo.getOne(user.getId());
+		myUserEntity.setCostumes(costumes);
+		UserEntity savedUser = userRepo.save(myUserEntity);
+		return UserDao.fromEntity(savedUser);
 	}
 }
 

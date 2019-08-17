@@ -29,6 +29,11 @@ function initPage(mode) {
     contentType: "application/json; charset=utf-8",
 	url: "/user",
 	success: function (data) {
+	  include_hats=data.costumes;
+	  $('#lucky-hat-btn').removeClass('active');
+	  if (include_hats) {
+	      $('#lucky-hat-btn').addClass('active');
+	  }
 	  $("#user").html(data.displayName);
 	  $(".unauthenticated").hide();
 	  $(".authenticated").show();
@@ -55,11 +60,23 @@ function initNavbar() {
   $('#lucky-hat-btn').on('click', function(event) {
 	var val = $(this).hasClass('active');
 	include_hats=!val;
-	if (current_view=="HOME") {
-		showHome();
-	} else if (current_view=="USER") {
-		showUser();
-	}
+    var data = { costumes: include_hats };
+	$.ajax({
+	  type: "POST",
+	  contentType: "application/json; charset=utf-8",
+	  url: "/user/prefs",
+	  data: JSON.stringify(data),
+	  success: function (data) {
+	    if (current_view=="HOME") {
+		  showHome();
+		} else if (current_view=="USER") {
+		  showUser();
+		}
+	  },
+	  error: function (result) {
+	    errorPage("Failed to update preferences", result);
+	  }
+	});
   });
 }
 

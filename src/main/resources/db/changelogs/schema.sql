@@ -6,6 +6,7 @@ create table users (
   name varchar(50) not null,
   displayname varchar(200) not null,
   admin boolean not null,
+  costumes boolean not null,
   primary key (id)
 );
 
