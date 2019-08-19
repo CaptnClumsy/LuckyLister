@@ -6,6 +6,7 @@ import lombok.Data;
 public class UpdatePokemonDao {
 
 	private boolean selected;
+	private Long total;
 	
 	public UpdatePokemonDao() {
 	}

@@ -210,4 +210,67 @@ public class UserController {
     		throw new UserServiceException(e.getMessage());
 		}
     }
+	
+	@RequestMapping("/hundo/user/pokemon/{id}")
+	public List<UserDao> usersHundo(@PathVariable("id") Long pokemonId, Principal principal) {
+		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+		try {
+			UserEntity user = userService.getCurrentUser(principal);
+			PokemonDao p = pokemonService.getPokemon(pokemonId);
+			List<UserDao> users = userService.getAllUsersWithHundoPokemon(user, p.getDexid());
+			return users;
+		} catch (UserNotFoundException e) {
+    		throw new ObjectNotFoundException("Current user not found");
+    	} catch (UserAlreadyRegisteredException e) {
+    		throw new UserServiceException(e.getMessage());
+		}
+    }
+	
+	@RequestMapping("/hundo/user/stats")
+	public TotalDao hundoStats(Principal principal) {
+		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+		try {
+			UserEntity user = userService.getCurrentUser(principal);
+			TotalDao stats = userService.getHundoStats(user);
+			return stats;
+		} catch (UserNotFoundException e) {
+			throw new ObjectNotFoundException("Current user not found");
+		} catch (UserAlreadyRegisteredException e) {
+			throw new UserServiceException(e.getMessage());
+		}
+    }
+	
+	@RequestMapping(value = "/hundo/user/leaderboard")
+    public List<LeaderDao> getHundoLeaderboard(Principal principal) {
+    	if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+    	try {
+    	    UserEntity user = userService.getCurrentUser(principal);
+		    return userService.getHundoLeaderboard(user);
+    	} catch (UserNotFoundException e) {
+    		throw new ObjectNotFoundException("Current user not found");
+    	} catch (UserAlreadyRegisteredException e) {
+    		throw new UserServiceException(e.getMessage());
+		}
+	}
+	
+	@RequestMapping(value = "/hundo/user/countboard")
+    public List<LeaderDao> getCountboard(Principal principal) {
+    	if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+    	try {
+    	    UserEntity user = userService.getCurrentUser(principal);
+		    return userService.getHundoCountboard(user);
+    	} catch (UserNotFoundException e) {
+    		throw new ObjectNotFoundException("Current user not found");
+    	} catch (UserAlreadyRegisteredException e) {
+    		throw new UserServiceException(e.getMessage());
+		}
+	}
 }

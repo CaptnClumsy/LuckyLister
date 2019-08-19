@@ -2,8 +2,10 @@ package com.clumsy.luckylister.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,10 +15,12 @@ import com.clumsy.luckylister.data.PokemonDao;
 import com.clumsy.luckylister.data.SelectListDao;
 import com.clumsy.luckylister.entities.PokemonEntity;
 import com.clumsy.luckylister.entities.UserEntity;
+import com.clumsy.luckylister.entities.UserHundoPokemonEntity;
 import com.clumsy.luckylister.entities.UserLuckyPokemonEntity;
 import com.clumsy.luckylister.entities.UserShinyPokemonEntity;
 import com.clumsy.luckylister.exceptions.ObjectNotFoundException;
 import com.clumsy.luckylister.repos.PokemonRepo;
+import com.clumsy.luckylister.repos.UserHundoPokemonRepo;
 import com.clumsy.luckylister.repos.UserLuckyPokemonRepo;
 import com.clumsy.luckylister.repos.UserShinyPokemonRepo;
 
@@ -26,13 +30,15 @@ public class PokemonService {
 	private final PokemonRepo pokemonRepo;
 	private final UserLuckyPokemonRepo luckyPokemonRepo;
 	private final UserShinyPokemonRepo shinyPokemonRepo;
+	private final UserHundoPokemonRepo hundoPokemonRepo;
 	
 	@Autowired
 	PokemonService(final PokemonRepo pokemonRepo, final UserLuckyPokemonRepo luckyPokemonRepo,
-		final UserShinyPokemonRepo shinyPokemonRepo) {
+		final UserShinyPokemonRepo shinyPokemonRepo, final UserHundoPokemonRepo hundoPokemonRepo) {
 		this.pokemonRepo = pokemonRepo;
 		this.luckyPokemonRepo = luckyPokemonRepo;
 		this.shinyPokemonRepo = shinyPokemonRepo;
+		this.hundoPokemonRepo = hundoPokemonRepo;
 	}
 
 	@Transactional(readOnly = true)
@@ -181,4 +187,64 @@ public class PokemonService {
 		dao.setDone(false);
 		return dao;
 	}
+
+	@Transactional(readOnly = true)
+	public List<PokemonDao> listHundoPokemon(UserEntity user) {
+		final List<UserHundoPokemonEntity> hundos = hundoPokemonRepo.findByUserId(user.getId());
+		final Map<Long, UserHundoPokemonEntity> hundoPokemon = 
+			hundos.stream().collect(Collectors.toMap(UserHundoPokemonEntity::getPokemonid, item -> item));
+		final List<PokemonEntity> entities = pokemonRepo.findAllHundos();
+		List<PokemonDao> daos = new ArrayList<>(entities.size());
+		for (PokemonEntity entity : entities) {
+			final PokemonDao dao = PokemonDao.fromEntity(entity);
+			final UserHundoPokemonEntity hundoEntry = hundoPokemon.get(dao.getId());
+			if (hundoEntry != null) {
+				dao.setDone(true);
+				dao.setTotal(hundoEntry.getTotal());
+			} else {
+				dao.setDone(false);
+				dao.setTotal(0L);
+			}
+			daos.add(dao);
+		}
+		return daos;
+	}
+
+	@Transactional
+	public PokemonDao updateHundoPokemon(UserEntity user, Long pokemonId, boolean selected, Long total) throws ObjectNotFoundException {
+		// find if user already selected this pokemon and load the details for it		
+		final UserHundoPokemonEntity entity = hundoPokemonRepo.findByUserIdAndPokemonId(user.getId(), pokemonId);
+		final Optional<PokemonEntity> pokemonEntity = pokemonRepo.findById(pokemonId);
+		if (!pokemonEntity.isPresent()) {
+			throw new ObjectNotFoundException("Unable to find pokemon");
+		}
+		final PokemonDao dao = PokemonDao.fromEntity(pokemonEntity.get());
+		
+		if (!selected) {
+			dao.setDone(false);
+			dao.setTotal(0L);
+			// delete the row
+			if (entity!=null) {
+		        hundoPokemonRepo.delete(entity);
+			}
+			return dao;
+		} 
+
+		// check if already selected
+		dao.setDone(true);
+		if (entity!=null) {    
+	        entity.setTotal(total);
+	        dao.setTotal(total);
+	        hundoPokemonRepo.save(entity);
+	        return dao;
+		}
+		// newly selected so we need to add a row
+		final UserHundoPokemonEntity newEntity = new UserHundoPokemonEntity();
+		newEntity.setPokemonid(pokemonId);
+		newEntity.setUserid(user.getId());
+		newEntity.setTotal(1L);
+		hundoPokemonRepo.save(newEntity);
+		return dao;
+	}
+
 }

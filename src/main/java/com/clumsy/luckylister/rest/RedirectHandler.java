@@ -18,4 +18,19 @@ public class RedirectHandler {
 	    return new ModelAndView("/shiny", model);
     }
 
+	@RequestMapping("/hundo/login/facebook")
+	public ModelAndView  hundoLogin(ModelMap model) {
+	    return new ModelAndView("/hundo", model);
+    }
+
+	@RequestMapping("/shiny")
+	public ModelAndView  shinyPage(ModelMap model) {
+	    return new ModelAndView("/shiny_index.html", model);
+    }
+	
+	@RequestMapping("/hundo")
+	public ModelAndView  hundoPage(ModelMap model) {
+	    return new ModelAndView("/hundo_index.html", model);
+    }
+
 }

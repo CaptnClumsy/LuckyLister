@@ -140,4 +140,52 @@ public class PokemonController {
 			throw new ObjectNotFoundException("User not found");
 		}
     }
+	
+	@RequestMapping("/hundo/pokemon")
+	public List<PokemonDao> listHundoPokemon(Principal principal) {
+		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+		try {
+			UserEntity user = userService.getCurrentUser(principal);
+			List<PokemonDao> pokemon = pokemonService.listHundoPokemon(user);
+			return pokemon;
+		} catch (UserNotFoundException e) {
+			throw new ObjectNotFoundException("Current user not found");
+		} catch (UserAlreadyRegisteredException e) {
+			throw new UserServiceException(e.getMessage());
+		}
+    }
+	
+	@RequestMapping(value = "/hundo/pokemon/{id}", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public PokemonDao updateHundoPokemon(@RequestBody UpdatePokemonDao updateData, @PathVariable("id") Long pokemonId, Principal principal) {
+    	if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+		try {
+			final UserEntity user = userService.getCurrentUser(principal);
+            final PokemonDao dao = pokemonService.updateHundoPokemon(user, pokemonId, updateData.isSelected(), updateData.getTotal());
+            return dao;
+		} catch (UserNotFoundException e) {
+			throw new ObjectNotFoundException("Current user not found");
+		} catch (UserAlreadyRegisteredException e) {
+			throw new UserServiceException(e.getMessage());
+		}
+    }
+	
+	@RequestMapping("/hundo/pokemon/user/{id}")
+	public List<PokemonDao> listHundoPokemonForUser(@PathVariable("id") Long userId, Principal principal) {
+		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+		try {
+			UserEntity user = userService.getUser(userId);
+			List<PokemonDao> pokemon = pokemonService.listHundoPokemon(user);
+			return pokemon;
+		} catch (UserNotFoundException e) {
+			throw new ObjectNotFoundException("User not found");
+		}
+    }
+
 }

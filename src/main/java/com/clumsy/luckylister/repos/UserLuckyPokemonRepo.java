@@ -15,4 +15,5 @@ public interface UserLuckyPokemonRepo extends JpaRepository<UserLuckyPokemonEnti
 
 	@Query("SELECT t FROM UserLuckyPokemonEntity t WHERE t.userid = ?1 AND t.pokemonid = ?2")
 	UserLuckyPokemonEntity findByUserIdAndPokemonId(Long id, Long pokemonId);
+
 }

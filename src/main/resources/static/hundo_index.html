@@ -8,9 +8,9 @@
     <title>LuckyLister</title>
     
     <meta property="og:type" content="website" />
-    <meta property="og:title" th:content="ShinyLister" />
-    <meta property="og:url" th:content="https://www.lucklister.com/shiny" />
-    <meta property="og:description" th:content="Track your shiny Pokemon and see what Pokemon other trainers need. Compare your shinydex progress with other trainers and have fun trading!" />
+    <meta property="og:title" th:content="HundoLister" />
+    <meta property="og:url" th:content="https://www.lucklister.com/hundo" />
+    <meta property="og:description" th:content="Track your hundred percent Pokemon and see what Pokemon other trainers need. Compare your progress with other trainers and have fun trading!" />
     <meta property="fb:app_id" content="882289415445644" />
 
     <base href="/"/>
@@ -34,22 +34,21 @@
   <body>
     <nav id ="lucky-nav-outer" class="navbar navbar-expand-sm navbar-static-top navbar-dark bg-primary lucky-top-nav">
       <div class="lucky-left-nav">
-        <div>
         <button class="dropdown-toggle btn btn-primary navbar-brand lucky-navbar-title lucky-nav-dropdown" type="button" id="navbar-title" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <img src="/images/shiny.png" class="d-inline-block align-text-bottom" alt="" width="20" height="20">
-          ShinyLister
+          <img src="/images/hundo.png" class="d-inline-block align-text-bottom" alt="" width="20" height="20">
+          HundoLister
         </button>
         <div class="bg-primary dropdown-menu lucky-mode-menu" aria-labelledby="navbar-title">
           <a class="btn navbar-brand lucky-navbar-title" id="navbar-lucky" href="/">
             <img src="/images/clover.png" class="d-inline-block align-text-bottom" alt="" width="20" height="20">
             LuckyLister
           </a>
-          <a class="btn navbar-brand lucky-navbar-title" id="navbar-hundo" href="/hundo">
-            <img src="/images/hundo.png" class="d-inline-block align-text-bottom" alt="" width="20" height="20">
-            HundoLister
+          <a class="btn navbar-brand lucky-navbar-title" id="navbar-shiny" href="/shiny">
+            <img src="/images/shiny.png" class="d-inline-block align-text-bottom" alt="" width="20" height="20">
+            ShinyLister
           </a>
         </div>
-        </div>
+        <div id="lucky-total" class="authenticated lucky-nav-total" style="display: none;"></div>
         <div id="lucky-gold-percent" class="authenticated lucky-nav-percent" style="display: none;">
         </div>
       </div>
@@ -59,7 +58,7 @@
       
       <div id="navbarNav" class="navbar-collapse collapse">
        <ul class="navbar-nav mr-auto">
-         <li class="nav-item lucky-nav-gap">
+         <li class="nav-item">
            <div id="lucky-nav-group" class="btn-group btn-group-toggle lucky-nav-group authenticated" data-toggle="buttons" style="display:none;">
              <label class="btn btn-primary lucky-nav-button active">
                <input type="radio" name="options" id="lucky-nav-home" autocomplete="off" value="HOME" checked>
@@ -78,14 +77,11 @@
                <i class="fa fa-trophy"></i>
              </label>
            </div>
-           <button type="button" class="btn btn-primary active lucky-hat-btn" id="lucky-hat-btn" data-toggle="button" aria-pressed="true" autocomplete="off">
-             <i class="fab fa-redhat"></i>
-           </button>
          </li>
         </ul>
         <ul class="navbar-nav">
           <li class="nav-item unauthenticated">
-            <a href="/shiny/login/facebook" class="btn btn-primary lucky-login-button"><i class="fa fa-facebook lucky-login-icon"></i>Login</a>
+            <a href="/hundo/login/facebook" class="btn btn-primary lucky-login-button"><i class="fa fa-facebook lucky-login-icon"></i>Login</a>
           </li>
           <li class="nav-link authenticated" style="display:none">
             <div class="lucky-nav-dropdown">
@@ -107,7 +103,7 @@
       <div id="not-logged-in" class="unauthenticated">
         <div class="jumbotron">
           <h1 class="display-4">Getting Started</h1>
-          <p class="lead">Login via Facebook using the link at the top of the page then start selecting which shiny Pokemon you already own. Using the buttons at the top of the page you can also see which shiny Pokemon other trainers need or which trainers need certain shiny Pokemon.  Have fun trading!</p>
+          <p class="lead">Login via Facebook using the link at the top of the page then start selecting which one hundred percent Pokemon you already own. Using the buttons at the top of the page you can also see which one hundred percent Pokemon other trainers need or which trainers need certain hundo Pokemon.  Have fun trading!</p>
           <hr class="my-4">
         </div>
       </div>
@@ -136,7 +132,7 @@
     <div id="lucky-user-page" style="display:none">
       <div>
         <div id="lucky-user-help" class="alert alert-info lucky-small-alert" role="alert">
-          Select the trainer you want to trade with to see which shiny Pokemon they need.
+          Select the trainer you want to trade with to see what one hundred percent Pokemon they need.
         </div>
         <div id="lucky-user-search" class="lucky-user-search"><select id="user-search" name="user-search" class="form-control"><option></option></select></div>
       </div>
@@ -150,7 +146,7 @@
     <div id="lucky-pokemon-page" style="display:none">
       <div>
         <div id="lucky-question-help" class="alert alert-info lucky-small-alert" role="alert">
-          Select the Pokemon you want to trade to see who needs it for their shiny collection.
+          Select the Pokemon you want to trade to see who needs it for their hundo collection.
         </div>
         <div id="lucky-question-search" class="lucky-question-search"><select id="question-search" name="question-search" class="form-control"><option></option></select></div>
       </div>
@@ -169,19 +165,42 @@
     </div>
 
     <div id="lucky-leader-page" style="display:none">
-      <div class="lucky-leader-pane" id="leaderboard">
-        <table id="leadersTable" class="table lucky-lead-table scrollable" style="width: 100%;">
-          <thead style="display:none;">
-            <tr>
-              <th>Rank</th>
-              <th>Name</th>
-              <th>Lucky</th>
-            </tr>
-          </thead>
-          <tbody id="leadersTableBody" class="lucky-lead-table-body"></tbody>
-        </table>
+      <span class="lucky-leader-tab-container">
+        <ul class="nav nav-tabs lucky-tab-list" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active lucky-leader-tab-label" data-toggle="tab" href="#completeLeaderboard" role="tab" aria-selected="true">Complete</a>
+          </li>
+          <li class="nav-item">
+            <a id="totalTab" class="nav-link lucky-leader-tab-label" data-toggle="tab" href="#countLeaderboard" role="tab" aria-selected="false">Count</a>
+          </li>
+        </ul>
+      </span>
+      <div class="tab-content">
+        <div class="tab-pane active lucky-leader-pane" id="completeLeaderboard" role="tabpanel">
+          <table id="leadersTable" class="table lucky-lead-table scrollable" style="width: 100%;">
+            <thead style="display:none;">
+              <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Lucky</th>
+              </tr>
+            </thead>
+            <tbody id="leadersTableBody" class="lucky-lead-table-body"></tbody>
+          </table>
+        </div>
+        <div class="tab-pane lucky-leader-pane" id="countLeaderboard" role="tabpanel">
+          <table id="countTable" class="table lucky-lead-table scrollable" style="width: 100%;">
+            <thead style="display:none;">
+              <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Lucky</th>
+              </tr>
+            </thead>
+            <tbody id="countTableBody" class="lucky-lead-table-body"></tbody>
+          </table>
+        </div>
       </div>
-    </div>
     </div>
 
     <div class="modal fade" id="errorPage" role="dialog">
@@ -204,7 +223,7 @@
     </div>
     
     <script type="text/javascript">
-      initPage("shiny");
+      initPage("hundo");
     </script>
 
   </body>

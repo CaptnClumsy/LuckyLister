@@ -275,5 +275,62 @@ public class UserService {
 		UserEntity savedUser = userRepo.save(myUserEntity);
 		return UserDao.fromEntity(savedUser);
 	}
+
+	@Transactional(readOnly = true)
+	public List<UserDao> getAllUsersWithHundoPokemon(UserEntity user, Long pokemonId) {
+		final List<UserEntity> users = userRepo.findAllHundoByPokemonId(pokemonId);
+		if (users == null) {
+			return Collections.emptyList();
+		}
+		final Set<Long> allFriends = friendRepo.findAllByUser(user.getId());
+		List<UserDao> userDaos = new ArrayList<>(users.size());
+		for (UserEntity thisUser : users) {
+			UserDao userDao = UserDao.fromEntity(thisUser);
+			if (allFriends!=null && allFriends.contains(thisUser.getId())) {
+				userDao.setFriends(true);
+			}
+			userDaos.add(userDao);
+		}
+		Collections.sort(userDaos, (u1, u2) -> {
+			if (u1.isFriends() == u2.isFriends()) {
+				return u1.getDisplayName().compareTo(u2.getDisplayName());
+			}
+			return (u1.isFriends() ? -1 : 1);
+		});
+		return userDaos;
+	}
+
+	@Transactional(readOnly = true)
+	public TotalDao getHundoStats(UserEntity user) {
+		Long total = userRepo.findHundoTotal();
+		Long amount = userRepo.findHundo(user.getId());
+		Long count = userRepo.findHundoCount(user.getId());
+		return new TotalDao(total, amount, count);
+	}
+
+	@Transactional(readOnly = true)
+	public List<LeaderDao> getHundoLeaderboard(UserEntity user) {
+		final List<LeaderEntity> leaderEntities = userRepo.findHundoLeaders();
+		final List<LeaderDao> leaders = new ArrayList<>(leaderEntities.size());
+		int rank = 1;
+		for (LeaderEntity leaderEntity : leaderEntities) {
+			LeaderDao leader = new LeaderDao(rank++, leaderEntity.getDisplayName(), leaderEntity.getTotal());
+			leaders.add(leader);
+		}
+		return leaders;
+	}
+
+	@Transactional(readOnly = true)
+	public List<LeaderDao> getHundoCountboard(UserEntity user) {
+		final List<LeaderEntity> leaderEntities = userRepo.findHundoCountLeaders();
+		final List<LeaderDao> leaders = new ArrayList<>(leaderEntities.size());
+		int rank = 1;
+		for (LeaderEntity leaderEntity : leaderEntities) {
+			LeaderDao leader = new LeaderDao(rank++, leaderEntity.getDisplayName(), leaderEntity.getTotal());
+			leaders.add(leader);
+		}
+		return leaders;
+	}
+
 }
 

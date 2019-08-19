@@ -1,9 +1,11 @@
 var leadersTable = null;
+var countTable = null;
 var userSelect = null;
 var page_mode = "";
 var api_url = "";
 var current_view = "HOME";
 var include_hats = true;
+var key_timeout = null;
 
 function initPage(mode) {
   if (mode!="lucky") {
@@ -133,6 +135,52 @@ function initHome() {
 	var val = $(this).find('input').val();
     filterPokemon(val);
   });
+  if (page_mode=="hundo") {
+	$(document).on('click', '.lucky-number-spinner button', pokemonTotalChanged);
+	$(document).on('keyup', '.lucky-number-spinner input', function () {
+	  clearTimeout(key_timeout);
+	  var textField = $(this);
+	  key_timeout = setTimeout(function () {
+	    var newValue = textField.val().trim();				
+	    var id = textField.attr('id');
+	    var prefix = "count-";
+	    var idStr = id.substr(prefix.length);
+	    updatePokemonTotal(idStr, newValue);
+	  }, 1000);
+	});
+  }
+}
+
+function updatePokemonTotal(idStr, newValue) {
+  if (newValue==0) {
+    selectPokemonTotal(idStr, false, 0);
+  } else {
+	selectPokemonTotal(idStr, true, newValue);
+  }
+}
+
+function pokemonTotalChanged(event) {
+  var btn = $(this),
+  oldValue = btn.closest('.lucky-number-spinner').find('input').val().trim(),
+  newValue = 0;
+				
+  var id = btn.closest('.lucky-number-spinner').find('input').attr('id');
+  var prefix = "count-";
+  var idStr = id.substr(prefix.length);
+	
+  if (btn.attr('data-dir') == 'up') {
+    newValue = parseInt(oldValue) + 1;
+  } else {
+	if (oldValue > 0) {
+	  newValue = parseInt(oldValue) - 1;
+	} else {
+	  newValue = 0;
+	}
+  }
+  if (oldValue != newValue) {
+    updatePokemonTotal(idStr, newValue);
+    btn.closest('.lucky-number-spinner').find('input').val(newValue);
+  }
 }
 
 function initUser() {
@@ -193,9 +241,9 @@ function showUserPokemon(id) {
 		if (!include_hats && data[i].costume!==0) {
 	      continue;
 	    }
-	    str += "<button id=\"user-pokemon-" + data[i].id + "\" class=\"lucky-cell\">";
-	    str += getCellHtml(data[i], width);
-	    str += "</button>\n";
+	    str += "<div class=\"lucky-pokemon-cell\" id=\"user-pokemon-" + data[i].id + "\">";
+	    str += getCellHtml(data[i], width, false);
+	    str += "</div>\n";
 	  }
     } else {
 		str="<div class=\"jumbotron lucky-professor-jumbo\">" +
@@ -270,13 +318,9 @@ function showHome() {
       if (!include_hats && data[i].costume!==0) {
     	  continue;
       }
-      str += "<button id=\"pokemon-" + data[i].id + "\" class=\"lucky-cell\" ";
-      if (data[i].available===true) {
-        str+= "onclick=\"selectPokemon(" + data[i].id + ")\"";
-      }
-      str += ">";
-      str += getCellHtml(data[i], width);
-      str += "</button>\n";
+      str += "<div class=\"lucky-pokemon-cell\" id=\"pokemon-" + data[i].id + "\">";
+      str += getCellHtml(data[i], width, true);
+      str += "</div>\n";
     }
     $("#pokemon").html(str);
     searchPokemon();
@@ -286,11 +330,17 @@ function showHome() {
 }
 
 function selectPokemon(id) {
-  // find out if already selected  
-  var element = "#pokemon-" + id;
-  var selected = $(element).find('span').hasClass("lucky-got");
+	// find out if already selected  
+	var element = "#pokemon-" + id;
+	var selected = $(element).find('span').hasClass("lucky-got");
+	// update it
+	selectPokemonTotal(id, !selected, 1);
+}
+
+function selectPokemonTotal(id, selected, total) {
   var data = {
-    selected: !selected
+    selected: selected,
+    total: total
   }
   // update it
   $.ajax({
@@ -300,9 +350,10 @@ function selectPokemon(id) {
 	data: JSON.stringify(data),
 	success: function (data) {
 	  // Update the UI
+	  var element = "#pokemon-" + id;
 	  var width = getImageSize("#pokemon");
 	  $(element).html("");
-      $(element).html(getCellHtml(data, width));
+      $(element).html(getCellHtml(data, width, true));
       resetPercentage();
       searchPokemon();
 	},
@@ -312,10 +363,15 @@ function selectPokemon(id) {
   });
 }
 
-function getCellHtml(data, width) {
+function getCellHtml(data, width, select) {
   var str = "";
   var labelClass = "lucky-need";
   var imgClass = "lucky-img ";
+  str += "<button class=\"lucky-cell\" ";
+  if (select==true) {
+    str+= "onclick=\"selectPokemon(" + data.id + ")\"";
+  }
+  str += ">";
   if (data.done===true) {
 	labelClass = "lucky-got";
 	str += "<img class=\"lucky-cell-tick\" src=\"images/tickmark.png\"></img>";
@@ -327,11 +383,23 @@ function getCellHtml(data, width) {
 	  imgClass += "lucky-img-outline";
   }
   str += " class=\""+imgClass+"\"></img>";
-  if (data.available!==true) {
-	  str += "<span class=\"lucky-img-notavailable\"></span>";
-  }
   str += "<span class=\"lucky-cell-label " + labelClass + "\">" + data.name + "</span>" +
 	"</button>\n";
+  if (page_mode=="hundo") {
+	str += "<div class=\"input-group lucky-number-spinner\">";
+	if (select==true) {
+	  str += "<span class=\"input-group-btn\"><button class=\"btn btn-default lucky-small-btn-l\" data-dir=\"dwn\"><i class=\"fa fa-minus\"></i></button></span>";
+	  str += "<input type=\"text\" class=\"form-control text-center lucky-count-input\" id=\"count-" + data.id + "\" value=\"" + data.total + "\">";
+	  str += "<span class=\"input-group-btn\"><button class=\"btn btn-default lucky-small-btn-r\" data-dir=\"up\"><i class=\"fa fa-plus\"></i></button></span>";
+	} else {
+	  str += "<span class=\"text-center lucky-count-text\">";
+	  if (data.total>1) {
+		str += data.total;
+	  }
+	  str += "</span>";
+	}
+	str += "</div>";
+  }
   return str;
 }
 
@@ -383,7 +451,7 @@ function getImageUrl(data) {
 
 function getImageSize(grid) {
   var divsize = $(grid).width();
-  var imgsize = Math.round(divsize / 8);
+  var imgsize = Math.round(divsize / 6);
   if (imgsize > 150) {
 	imgsize = 150;
   }
@@ -409,7 +477,7 @@ function searchUserPokemon() {
   input = document.getElementById("lucky-user-searchbox");
   filterText = input.value.toUpperCase();
   grid = document.getElementById("user-pokemon");
-  cells = grid.getElementsByClassName("lucky-cell");
+  cells = grid.getElementsByClassName("lucky-pokemon-cell");
 		  
   // Loop through all grid rows, and hide those who don't match the search query
   for (i = 0; i < cells.length; i++) {
@@ -437,7 +505,7 @@ function filterPokemon(filter) {
   input = document.getElementById("lucky-searchbox");
   filterText = input.value.toUpperCase().trim();
   grid = document.getElementById("pokemon");
-  cells = grid.getElementsByClassName("lucky-cell");
+  cells = grid.getElementsByClassName("lucky-pokemon-cell");
   
   // Loop through all grid rows, and hide those who don't match the search query
   var need = 0;
@@ -468,8 +536,10 @@ function filterPokemon(filter) {
     var str="<div class=\"jumbotron lucky-professor-jumbo\">";
     if (page_mode=="lucky") {
 	  str += "<p class=\"lead\">You are a Pokemon master! You have got all the lucky Pokemon.</p>";
-    } else {
+    } else if (page_mode=="shiny") {
       str += "<p class=\"lead\">You are a Pokemon master! You have got all the shiny Pokemon.</p>";	
+    } else {
+      str += "<p class=\"lead\">You are a Pokemon master! You have got a hundo of every single Pokemon.</p>";
     }
 	str += "<div class=\"lucky-professor\"></div></div>";
     $('#got-them-all').html(str);
@@ -482,6 +552,9 @@ function filterPokemon(filter) {
 
 function resetPercentage() {
   $.get(api_url+"/user/stats", function(data) {
+	  if (page_mode=="hundo") {
+		  $('#lucky-total').html(data.count);
+	  }
 	  var colors = getPercentageColors();
 	  // Clear previous percentage
 	  $('#lucky-gold-percent').html('');
@@ -502,6 +575,13 @@ function getPercentageColors() {
 }
 
 function showLeaderboard() {
+    queryLeaderboard();
+    if (page_mode=="hundo") {
+      queryCountLeaderboard();
+    }
+}
+
+function queryLeaderboard() {
   $('#leadersTableBody').html("Loading...");
   $.ajax({
     type: "GET",
@@ -519,33 +599,79 @@ function showLeaderboard() {
       	    "<td class=\"" + rankClass + "\">" + getRankHtml(data[i].rank) + "</td>" +
       	    "<td class=\"" + rankClass + "\">"  + data[i].name + "</td>" +
       	    "<td class=\"" + rankClass + " lucky-lead-total\">"  + data[i].total + "</td>");
-      	  }
-      	  // Initialize the table
-          leadersTable = $('#leadersTable').DataTable({
-            "autoWidth": true,
-          	"scrollY": "400px",
-          	"scrollX": true,
-          	"searching": false,
-          	"lengthChange": false,
-          	"paging": false
-          });
-        }
-     },
-     error: function (result) {
-       resetLeadersTable();
-       $('#leadersTableBody').html("");
-       var errorHtml = "<tr><td><div class=\"alert alert-danger\" role=\"alert\">Failed to query leaderboard.";
-       if (result.responseJSON !== undefined) {
-         errorHtml += "<br>" + result.responseJSON.message;
-       }
-       errorHtml += "</div></td></tr>";
-       $('#leadersTableBody').append(errorHtml);
-     },
-     complete: function() {
-       if (leadersTable != null) {
-         leadersTable.columns.adjust().draw();
-       }
-     }
+      	}
+	    leadersTable = $('#leadersTable').DataTable({
+	      "autoWidth": true,
+	      "scrollY": "400px",
+	      "scrollX": true,
+	      "searching": false,
+	      "lengthChange": false,
+	      "paging": false
+	    });
+      }
+    },
+    error: function (result) {
+      resetLeadersTable();
+      $('#leadersTableBody').html("");
+      var errorHtml = "<tr><td><div class=\"alert alert-danger\" role=\"alert\">Failed to query leaderboard.";
+      if (result.responseJSON !== undefined) {
+        errorHtml += "<br>" + result.responseJSON.message;
+      }
+      errorHtml += "</div></td></tr>";
+      $('#leadersTableBody').append(errorHtml);
+    },
+    complete: function() {
+      if (leadersTable != null) {
+        leadersTable.columns.adjust().draw();
+      }
+    }
+  });
+}
+
+function queryCountLeaderboard() {
+  $('#countTableBody').html("Loading...");
+  $.ajax({
+    type: "GET",
+    contentType: "application/json; charset=utf-8",
+    url: api_url+"/user/countboard",
+    success: function (data) {
+      resetCountTable();
+      $('#countTableBody').html("");
+      if (data == null || data.length==0) {
+        $('#countTableBody').append("<tr><td><div class=\"alert alert-warning\" role=\"alert\">No leaderboard to display.</div></td></tr>");
+      } else {
+        for (var i = 0; i < data.length; i++) {
+      	  var rankClass = getRankClass(data[i].rank);
+      	  $('#countTableBody').append("<tr>" +
+      	    "<td class=\"" + rankClass + "\">" + getRankHtml(data[i].rank) + "</td>" +
+      	    "<td class=\"" + rankClass + "\">"  + data[i].name + "</td>" +
+      	    "<td class=\"" + rankClass + " lucky-lead-total\">"  + data[i].total + "</td>");
+      	}
+	    countTable = $('#countTable').DataTable({
+	      "autoWidth": true,
+	      "scrollY": "400px",
+	      "scrollX": true,
+	      "searching": false,
+	      "lengthChange": false,
+	      "paging": false
+	    });
+      }
+    },
+    error: function (result) {
+      resetCountTable();
+      $('#countTableBody').html("");
+      var errorHtml = "<tr><td><div class=\"alert alert-danger\" role=\"alert\">Failed to query leaderboard.";
+      if (result.responseJSON !== undefined) {
+        errorHtml += "<br>" + result.responseJSON.message;
+      }
+      errorHtml += "</div></td></tr>";
+      $('#countTableBody').append(errorHtml);
+    },
+    complete: function() {
+      if (countTable != null) {
+        countTable.columns.adjust().draw();
+      }
+    }
   });
 }
 
@@ -579,6 +705,13 @@ function resetLeadersTable() {
   if (leadersTable != null) {
     leadersTable.destroy();
     leadersTable = null;
+  }
+}
+
+function resetCountTable() {
+  if (countTable != null) {
+    countTable.destroy();
+    countTable = null;
   }
 }
 

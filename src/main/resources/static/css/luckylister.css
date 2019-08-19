@@ -98,6 +98,12 @@ body {
     overflow-x: hidden;
     position: absolute !important;
 }
+.lucky-nav-total {
+    font-weight: bold;
+    color: white;
+    margin-right: 6px;
+    text-align: center;
+}
 .lucky-nav-percent {
     height: 56px;
     width: 50px;
@@ -130,6 +136,14 @@ body {
 	width: 42px;
     height: 42px;
     top: -43px;
+}
+.lucky-percentage-total {
+    position: absolute;
+    text-align: center;
+    font-size: 10px;
+    width: 42px;
+    height: 42px;
+    top: 0px;
 }
 .lucky-container {
 	width: 100%;
@@ -166,19 +180,29 @@ body {
     padding: 0px;
     background: transparent;
     align-self: baseline;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    margin-left: auto;
+    margin-right: auto;
 }
 .lucky-cell-tick {
 	position: absolute;
-    left: 10px;
+    left: 2px;
     font-size: small;
     width: 1.5rem;
 }
 .lucky-cell-label {
 	font-size: 14px;
+	line-height: 14px;
     font-weight: 700;
-    width: 100px;
     display: inline-block;
     white-space: nowrap;
+    min-width: 100px;
+}
+.lucky-img {
+	margin-left: auto;
+    margin-right: auto;
 }
 .lucky-img-notavailable {
 	background-image: url('/images/noentry.png');
@@ -298,4 +322,45 @@ body {
 	padding: 10px;
 	width: 100%;
     text-align: left;
+}
+.lucky-count-input {
+	padding: 0px;
+	min-width: 10px;
+	width: 10px !important;
+	font-size: 10px;
+	border: 1px solid #737373;
+	border-left: 0px;
+	border-right: 0px;
+}
+.lucky-number-spinner {
+	font-size: 10px;
+	padding-left: 6px;
+    padding-right: 6px;
+    margin-top: 6px;
+}
+.lucky-small-btn-l {
+	font-size: 10px;
+	border-radius: 25px;
+    border: 1px solid #737373;
+    margin-left: 10px;
+    margin-right: 0px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    padding: 6px;
+}
+.lucky-small-btn-r {
+	font-size: 10px;
+	border-radius: 25px;
+    border: 1px solid #737373;
+    margin-left: 0px;
+    margin-right: 10px;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    padding: 6px;
+}
+.lucky-count-text {
+	width: 100%;
+}
+.lucky-tab-list {
+	margin-top: 4px;
 }
