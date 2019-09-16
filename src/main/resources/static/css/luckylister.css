@@ -22,6 +22,7 @@ body {
 	padding-left: 4px;
     padding-top: 4px;
     padding-bottom: 4px;
+    padding-right: 4px;
 }
 .lucky-left-nav {
 	display: flex;
@@ -34,11 +35,15 @@ body {
     padding-top: 0px;
     margin-right: 4px;
     padding-right: 2px;
+    padding-left: 4px;
 }
 .lucky-mode-menu {
 	width: 170px;
     top: 50px;
     left: 4px;
+}
+.navbar-toggler{
+    padding: 3px !important;
 }
 .lucky-navbar-right {
 	justify-content: flex-end;
