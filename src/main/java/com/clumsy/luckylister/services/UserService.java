@@ -215,8 +215,27 @@ public class UserService {
 	}
 
 	@Transactional(readOnly = true)
+	public TotalDao getShadowStats(UserEntity user) {
+		Long total = userRepo.findShadowTotal();
+		Long amount = userRepo.findShadow(user.getId());
+		return new TotalDao(total, amount);
+	}
+
+	@Transactional(readOnly = true)
 	public List<LeaderDao> getShinyLeaderboard(UserEntity user) {
 		final List<LeaderEntity> leaderEntities = userRepo.findShinyLeaders();
+		final List<LeaderDao> leaders = new ArrayList<>(leaderEntities.size());
+		int rank = 1;
+		for (LeaderEntity leaderEntity : leaderEntities) {
+			LeaderDao leader = new LeaderDao(rank++, leaderEntity.getDisplayName(), leaderEntity.getTotal());
+			leaders.add(leader);
+		}
+		return leaders;
+	}
+	
+	@Transactional(readOnly = true)
+	public List<LeaderDao> getShadowLeaderboard(UserEntity user) {
+		final List<LeaderEntity> leaderEntities = userRepo.findShadowLeaders();
 		final List<LeaderDao> leaders = new ArrayList<>(leaderEntities.size());
 		int rank = 1;
 		for (LeaderEntity leaderEntity : leaderEntities) {
@@ -267,6 +286,31 @@ public class UserService {
 		});
 		return userDaos;
 	}
+	
+	@Transactional(readOnly = true)
+	public List<UserDao> getAllUsersWithShadowPokemon(UserEntity user, Long pokemonId) {
+		final List<UserEntity> users = userRepo.findAllShadowByPokemonId(pokemonId);
+		if (users == null) {
+			return Collections.emptyList();
+		}
+		final Set<Long> allFriends = friendRepo.findAllByUser(user.getId());
+		List<UserDao> userDaos = new ArrayList<>(users.size());
+		for (UserEntity thisUser : users) {
+			UserDao userDao = UserDao.fromEntity(thisUser);
+			if (allFriends!=null && allFriends.contains(thisUser.getId())) {
+				userDao.setFriends(true);
+			}
+			userDaos.add(userDao);
+		}
+		Collections.sort(userDaos, (u1, u2) -> {
+			if (u1.isFriends() == u2.isFriends()) {
+				return u1.getDisplayName().compareTo(u2.getDisplayName());
+			}
+			return (u1.isFriends() ? -1 : 1);
+		});
+		return userDaos;
+	}
+
 
 	@Transactional
 	public UserDao updateUser(UserEntity user, boolean costumes) throws UserNotFoundException {

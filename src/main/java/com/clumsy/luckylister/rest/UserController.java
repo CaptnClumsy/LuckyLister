@@ -194,6 +194,21 @@ public class UserController {
 		}
 	}
 	
+	@RequestMapping(value = "/shadow/user/leaderboard")
+    public List<LeaderDao> getShadowLeaderboard(Principal principal) {
+    	if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+    	try {
+    	    UserEntity user = userService.getCurrentUser(principal);
+		    return userService.getShadowLeaderboard(user);
+    	} catch (UserNotFoundException e) {
+    		throw new ObjectNotFoundException("Current user not found");
+    	} catch (UserAlreadyRegisteredException e) {
+    		throw new UserServiceException(e.getMessage());
+		}
+	}
+	
 	@RequestMapping("/shiny/user/pokemon/{id}")
 	public List<UserDao> usersShiny(@PathVariable("id") Long pokemonId, Principal principal) {
 		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
@@ -203,6 +218,23 @@ public class UserController {
 			UserEntity user = userService.getCurrentUser(principal);
 			PokemonDao p = pokemonService.getPokemon(pokemonId);
 			List<UserDao> users = userService.getAllUsersWithShinyPokemon(user, p.getDexid());
+			return users;
+		} catch (UserNotFoundException e) {
+    		throw new ObjectNotFoundException("Current user not found");
+    	} catch (UserAlreadyRegisteredException e) {
+    		throw new UserServiceException(e.getMessage());
+		}
+    }
+	
+	@RequestMapping("/shadow/user/pokemon/{id}")
+	public List<UserDao> usersShadow(@PathVariable("id") Long pokemonId, Principal principal) {
+		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+		try {
+			UserEntity user = userService.getCurrentUser(principal);
+			PokemonDao p = pokemonService.getPokemon(pokemonId);
+			List<UserDao> users = userService.getAllUsersWithShadowPokemon(user, p.getId());
 			return users;
 		} catch (UserNotFoundException e) {
     		throw new ObjectNotFoundException("Current user not found");
@@ -236,6 +268,22 @@ public class UserController {
 		try {
 			UserEntity user = userService.getCurrentUser(principal);
 			TotalDao stats = userService.getHundoStats(user);
+			return stats;
+		} catch (UserNotFoundException e) {
+			throw new ObjectNotFoundException("Current user not found");
+		} catch (UserAlreadyRegisteredException e) {
+			throw new UserServiceException(e.getMessage());
+		}
+    }
+	
+	@RequestMapping("/shadow/user/stats")
+	public TotalDao shadowStats(Principal principal) {
+		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+		try {
+			UserEntity user = userService.getCurrentUser(principal);
+			TotalDao stats = userService.getShadowStats(user);
 			return stats;
 		} catch (UserNotFoundException e) {
 			throw new ObjectNotFoundException("Current user not found");

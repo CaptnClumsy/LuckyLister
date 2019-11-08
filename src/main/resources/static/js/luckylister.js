@@ -260,7 +260,7 @@ function initPokemon() {
   $.ajax({
     type: "GET",
 	contentType: "application/json; charset=utf-8",
-	url: "/pokemon/all",
+	url: api_url+"/pokemon/all",
 	success: function (data) {
 	  $('#question-search').select2({
 	    placeholder: "Select a Pokemon",

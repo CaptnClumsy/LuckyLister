@@ -18,6 +18,11 @@ public class RedirectHandler {
 	    return new ModelAndView("/shiny", model);
     }
 
+	@RequestMapping("/shadow/login/facebook")
+	public ModelAndView  shadowLogin(ModelMap model) {
+	    return new ModelAndView("/shadow", model);
+    }
+	
 	@RequestMapping("/hundo/login/facebook")
 	public ModelAndView  hundoLogin(ModelMap model) {
 	    return new ModelAndView("/hundo", model);
@@ -26,6 +31,11 @@ public class RedirectHandler {
 	@RequestMapping("/shiny")
 	public ModelAndView  shinyPage(ModelMap model) {
 	    return new ModelAndView("/shiny_index.html", model);
+    }
+	
+	@RequestMapping("/shadow")
+	public ModelAndView  shadowPage(ModelMap model) {
+	    return new ModelAndView("/shadow_index.html", model);
     }
 	
 	@RequestMapping("/hundo")

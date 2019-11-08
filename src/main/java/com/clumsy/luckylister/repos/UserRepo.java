@@ -43,10 +43,21 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
 	@Query("SELECT COUNT(*) FROM PokemonEntity t WHERE t.shiny=true")
 	Long findShinyTotal();
 	
+	@Query("SELECT COUNT(*) FROM UserShadowPokemonEntity t WHERE t.userid=?1")
+	Long findShadow(Long userid);
+	
+	@Query("SELECT COUNT(*) FROM PokemonEntity t WHERE t.shadow=true")
+	Long findShadowTotal();
+	
 	@Query("SELECT u.id AS id, u.displayName AS displayName, COUNT(*) AS total " +
 			"FROM UserEntity u, UserShinyPokemonEntity p WHERE p.userid=u.id " + 
 			"GROUP BY u.id ORDER BY total DESC, displayName DESC")
 	List<LeaderEntity> findShinyLeaders();
+	
+	@Query("SELECT u.id AS id, u.displayName AS displayName, COUNT(*) AS total " +
+			"FROM UserEntity u, UserShadowPokemonEntity p WHERE p.userid=u.id " + 
+			"GROUP BY u.id ORDER BY total DESC, displayName DESC")
+	List<LeaderEntity> findShadowLeaders();
 	
 	@Query("SELECT l.userid AS id, COUNT(*) AS count FROM UserShinyPokemonEntity l WHERE " +
 			  "l.pokemonid IN (SELECT p.id FROM PokemonEntity p WHERE p.dexid=?1 AND p.shiny=true) GROUP BY l.userid ORDER BY l.userid")
@@ -58,6 +69,13 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
 			  "l.pokemonid=?1) " +
 			"ORDER BY t.displayName ASC")
 	List<UserEntity> findAllHundoByPokemonId(Long pokemonId);
+	
+	@Query("SELECT t FROM UserEntity t WHERE t.id != 0 AND " +
+			" t.id NOT IN (" +
+			  "SELECT l.userid FROM UserShadowPokemonEntity l WHERE " +
+			  "l.pokemonid=?1) " +
+			"ORDER BY t.displayName ASC")
+	List<UserEntity> findAllShadowByPokemonId(Long pokemonId);
 	
 	@Query("SELECT COUNT(*) FROM UserHundoPokemonEntity t WHERE t.userid=?1")
 	Long findHundo(Long userid);

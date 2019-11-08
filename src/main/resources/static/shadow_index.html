@@ -8,9 +8,9 @@
     <title>LuckyLister</title>
     
     <meta property="og:type" content="website" />
-    <meta property="og:title" th:content="LuckyLister" />
-    <meta property="og:url" th:content="https://www.lucklister.com" />
-    <meta property="og:description" th:content="Track your lucky Pokemon and see what Pokemon other trainers need. Compare your luckydex progress with other trainers and have fun trading!" />
+    <meta property="og:title" th:content="ShadowLister" />
+    <meta property="og:url" th:content="https://www.lucklister.com/shadow" />
+    <meta property="og:description" th:content="Track your shadow Pokemon and see what Pokemon other trainers need. Compare your shadowdex progress with other trainers and have fun!" />
     <meta property="fb:app_id" content="882289415445644" />
 
     <base href="/"/>
@@ -34,23 +34,25 @@
   <body>
     <nav id ="lucky-nav-outer" class="navbar navbar-expand-sm navbar-static-top navbar-dark bg-primary lucky-top-nav">
       <div class="lucky-left-nav">
+        <div>
         <button class="dropdown-toggle btn btn-primary navbar-brand lucky-navbar-title lucky-nav-dropdown" type="button" id="navbar-title" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <img src="/images/clover.png" class="d-inline-block align-text-bottom" alt="" width="20" height="20">
-          LuckyLister
+          <img src="/images/shadow.png" class="d-inline-block align-text-bottom" alt="" width="20" height="20">
+          ShadowLister
         </button>
         <div class="bg-primary dropdown-menu lucky-mode-menu" aria-labelledby="navbar-title">
+          <a class="btn navbar-brand lucky-navbar-title" id="navbar-lucky" href="/">
+            <img src="/images/clover.png" class="d-inline-block align-text-bottom" alt="" width="20" height="20">
+            LuckyLister
+          </a>
           <a class="btn navbar-brand lucky-navbar-title" id="navbar-shiny" href="/shiny">
             <img src="/images/shiny.png" class="d-inline-block align-text-bottom" alt="" width="20" height="20">
             ShinyLister
-          </a>
-          <a class="btn navbar-brand lucky-navbar-title" id="navbar-shadow" href="/shadow">
-            <img src="/images/shadow.png" class="d-inline-block align-text-bottom" alt="" width="20" height="20">
-            ShadowLister
           </a>
           <a class="btn navbar-brand lucky-navbar-title" id="navbar-hundo" href="/hundo">
             <img src="/images/hundo.png" class="d-inline-block align-text-bottom" alt="" width="20" height="20">
             HundoLister
           </a>
+        </div>
         </div>
         <div id="lucky-gold-percent" class="authenticated lucky-nav-percent" style="display: none;">
         </div>
@@ -61,7 +63,7 @@
       
       <div id="navbarNav" class="navbar-collapse collapse">
        <ul class="navbar-nav mr-auto">
-         <li class="nav-item">
+         <li class="nav-item lucky-nav-gap">
            <div id="lucky-nav-group" class="btn-group btn-group-toggle lucky-nav-group authenticated" data-toggle="buttons" style="display:none;">
              <label class="btn btn-primary lucky-nav-button active">
                <input type="radio" name="options" id="lucky-nav-home" autocomplete="off" value="HOME" checked>
@@ -84,7 +86,7 @@
         </ul>
         <ul class="navbar-nav">
           <li class="nav-item unauthenticated">
-            <a href="/login/facebook" class="btn btn-primary lucky-login-button"><i class="fa fa-facebook lucky-login-icon"></i>Login</a>
+            <a href="/shadow/login/facebook" class="btn btn-primary lucky-login-button"><i class="fa fa-facebook lucky-login-icon"></i>Login</a>
           </li>
           <li class="nav-link authenticated" style="display:none">
             <div class="lucky-nav-dropdown">
@@ -106,7 +108,7 @@
       <div id="not-logged-in" class="unauthenticated">
         <div class="jumbotron">
           <h1 class="display-4">Getting Started</h1>
-          <p class="lead">Login via Facebook using the link at the top of the page then start selecting which lucky Pokemon you already own. Using the buttons at the top of the page you can also see which lucky Pokemon other trainers need or which trainers need certain lucky Pokemon.  Have fun trading!</p>
+          <p class="lead">Login via Facebook using the link at the top of the page then start selecting which shadow Pokemon you already own. Using the buttons at the top of the page you can also see which shadow Pokemon other trainers need or which trainers need certain shadow Pokemon.  Have fun!</p>
           <hr class="my-4">
         </div>
       </div>
@@ -135,7 +137,7 @@
     <div id="lucky-user-page" style="display:none">
       <div>
         <div id="lucky-user-help" class="alert alert-info lucky-small-alert" role="alert">
-          Select the trainer you want to trade with to see what Pokemon they need.
+          Select the trainer you want to trade with to see which shadow Pokemon they need.
         </div>
         <div id="lucky-user-search" class="lucky-user-search"><select id="user-search" name="user-search" class="form-control"><option></option></select></div>
       </div>
@@ -149,7 +151,7 @@
     <div id="lucky-pokemon-page" style="display:none">
       <div>
         <div id="lucky-question-help" class="alert alert-info lucky-small-alert" role="alert">
-          Select the Pokemon you want to trade to see who needs it for their lucky collection.
+          Select the Pokemon you want to trade to see who needs it for their shadow collection.
         </div>
         <div id="lucky-question-search" class="lucky-question-search"><select id="question-search" name="question-search" class="form-control"><option></option></select></div>
       </div>
@@ -174,13 +176,14 @@
             <tr>
               <th>Rank</th>
               <th>Name</th>
-              <th>Lucky</th>
+              <th>Shadow</th>
             </tr>
           </thead>
           <tbody id="leadersTableBody" class="lucky-lead-table-body"></tbody>
         </table>
       </div>
     </div>
+    
     </div>
 
     <div class="modal fade" id="errorPage" role="dialog">
@@ -203,7 +206,7 @@
     </div>
     
     <script type="text/javascript">
-      initPage("lucky");
+      initPage("shadow");
     </script>
 
   </body>

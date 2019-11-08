@@ -13,6 +13,7 @@ public class PokemonDao {
 	private boolean done;
 	private boolean lucky;
 	private boolean shiny;
+	private boolean shadow;
 	private Long costume;
 	private Long region;
 	private Long total;
@@ -21,13 +22,14 @@ public class PokemonDao {
 	}
 	
 	public PokemonDao(final Long id, final Long dexid, final String name, boolean lucky,
-		boolean shiny, Long costume, Long region) {
+		boolean shiny, boolean shadow, Long costume, Long region) {
 		this.id=id;
 		this.dexid=dexid;
 		this.name=name;
 		this.done=true;
 		this.lucky=lucky;
 		this.shiny=shiny;
+		this.shadow=shadow;
 		this.costume=costume;
 		this.region=region;
 		this.total=1L;
@@ -36,7 +38,8 @@ public class PokemonDao {
 	public static PokemonDao fromEntity(PokemonEntity pokemon) {
 		return new PokemonDao(pokemon.getId(), pokemon.getDexid(),
 		    pokemon.getName(), pokemon.getLucky(),
-		    pokemon.getShiny(), pokemon.getCostume(), pokemon.getRegion());
+		    pokemon.getShiny(), pokemon.getShadow(),
+		    pokemon.getCostume(), pokemon.getRegion());
 	}
 
 }

@@ -94,6 +94,45 @@ public class PokemonController {
 		}
     }
 	
+	@RequestMapping("/shiny/pokemon/all")
+	public List<SelectListDao> listAllShinyPokemon(Principal principal) {
+		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+		try {
+			List<SelectListDao> pokemon = pokemonService.listAllPokemon();
+			return pokemon;
+		} catch (ObjectNotFoundException e) {
+			throw new ObjectNotFoundException("No Pokemon found");
+		}
+    }
+	
+	@RequestMapping("/hundo/pokemon/all")
+	public List<SelectListDao> listAllHundoPokemon(Principal principal) {
+		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+		try {
+			List<SelectListDao> pokemon = pokemonService.listAllPokemon();
+			return pokemon;
+		} catch (ObjectNotFoundException e) {
+			throw new ObjectNotFoundException("No Pokemon found");
+		}
+    }
+	
+	@RequestMapping("/shadow/pokemon/all")
+	public List<SelectListDao> listAllShadowPokemon(Principal principal) {
+		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+		try {
+			List<SelectListDao> pokemon = pokemonService.listAllShadowPokemon();
+			return pokemon;
+		} catch (ObjectNotFoundException e) {
+			throw new ObjectNotFoundException("No Pokemon found");
+		}
+    }
+	
 	@RequestMapping("/shiny/pokemon")
 	public List<PokemonDao> listShinyPokemon(Principal principal) {
 		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
@@ -102,6 +141,22 @@ public class PokemonController {
 		try {
 			UserEntity user = userService.getCurrentUser(principal);
 			List<PokemonDao> pokemon = pokemonService.listShinyPokemon(user);
+			return pokemon;
+		} catch (UserNotFoundException e) {
+			throw new ObjectNotFoundException("Current user not found");
+		} catch (UserAlreadyRegisteredException e) {
+			throw new UserServiceException(e.getMessage());
+		}
+    }
+	
+	@RequestMapping("/shadow/pokemon")
+	public List<PokemonDao> listShadowPokemon(Principal principal) {
+		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+		try {
+			UserEntity user = userService.getCurrentUser(principal);
+			List<PokemonDao> pokemon = pokemonService.listShadowPokemon(user);
 			return pokemon;
 		} catch (UserNotFoundException e) {
 			throw new ObjectNotFoundException("Current user not found");
@@ -127,6 +182,23 @@ public class PokemonController {
 		}
     }
 	
+	@RequestMapping(value = "/shadow/pokemon/{id}", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public PokemonDao updateShadowPokemon(@RequestBody UpdatePokemonDao updateData, @PathVariable("id") Long pokemonId, Principal principal) {
+    	if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+		try {
+			final UserEntity user = userService.getCurrentUser(principal);
+            final PokemonDao dao = pokemonService.updateShadowPokemon(user, pokemonId, updateData.isSelected());
+            return dao;
+		} catch (UserNotFoundException e) {
+			throw new ObjectNotFoundException("Current user not found");
+		} catch (UserAlreadyRegisteredException e) {
+			throw new UserServiceException(e.getMessage());
+		}
+    }
+	
 	@RequestMapping("/shiny/pokemon/user/{id}")
 	public List<PokemonDao> listShinyPokemonForUser(@PathVariable("id") Long userId, Principal principal) {
 		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
@@ -135,6 +207,20 @@ public class PokemonController {
 		try {
 			UserEntity user = userService.getUser(userId);
 			List<PokemonDao> pokemon = pokemonService.listShinyPokemonForUser(user);
+			return pokemon;
+		} catch (UserNotFoundException e) {
+			throw new ObjectNotFoundException("User not found");
+		}
+    }
+	
+	@RequestMapping("/shadow/pokemon/user/{id}")
+	public List<PokemonDao> listShadowPokemonForUser(@PathVariable("id") Long userId, Principal principal) {
+		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+		try {
+			UserEntity user = userService.getUser(userId);
+			List<PokemonDao> pokemon = pokemonService.listShadowPokemonForUser(user);
 			return pokemon;
 		} catch (UserNotFoundException e) {
 			throw new ObjectNotFoundException("User not found");
