@@ -35,10 +35,10 @@ public interface PokemonRepo extends JpaRepository<PokemonEntity, Long> {
 	@Query("SELECT COUNT(*) FROM PokemonEntity t WHERE t.shiny=true AND t.dexid=?1")
 	Integer countAllShinyByDexId(Long dexId);
 	
-	@Query("SELECT t FROM PokemonEntity t WHERE t.shiny=false AND t.id NOT IN (SELECT t1.pokemonid FROM UserHundoPokemonEntity t1 "
+	@Query("SELECT t FROM PokemonEntity t WHERE t.shiny=false AND t.shadow=false AND t.id NOT IN (SELECT t1.pokemonid FROM UserHundoPokemonEntity t1 "
 			+ "WHERE t1.userid=?1) ORDER BY t.dexid ASC, t.region ASC, t.costume ASC")
 	List<PokemonEntity> findAllHundoForUser(Long userId);
 	
-	@Query("SELECT t FROM PokemonEntity t WHERE t.shiny=false ORDER BY t.dexid ASC")
+	@Query("SELECT t FROM PokemonEntity t WHERE t.shiny=false AND t.shadow=false ORDER BY t.dexid ASC")
 	List<PokemonEntity> findAllHundos();
 }

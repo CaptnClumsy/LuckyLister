@@ -17,7 +17,7 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
 	@Query("SELECT t FROM UserEntity t WHERE t.id != 0 ORDER BY t.displayName ASC")
 	List<UserEntity> findAll();
 	
-	@Query("SELECT COUNT(*) FROM PokemonEntity t WHERE t.lucky=true")
+	@Query("SELECT COUNT(*) FROM PokemonEntity t WHERE t.lucky=true AND t.shadow=false")
 	Long findTotal();
 	
 	@Query("SELECT COUNT(*) FROM UserLuckyPokemonEntity t WHERE t.userid=?1")
@@ -80,7 +80,7 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
 	@Query("SELECT COUNT(*) FROM UserHundoPokemonEntity t WHERE t.userid=?1")
 	Long findHundo(Long userid);
 	
-	@Query("SELECT COUNT(*) FROM PokemonEntity t WHERE t.shiny=false")
+	@Query("SELECT COUNT(*) FROM PokemonEntity t WHERE t.shiny=false AND t.shadow=false")
 	Long findHundoTotal();
 	
 	@Query("SELECT u.id AS id, u.displayName AS displayName, COUNT(*) AS total " +
