@@ -538,6 +538,8 @@ function filterPokemon(filter) {
 	  str += "<p class=\"lead\">You are a Pokemon master! You have got all the lucky Pokemon.</p>";
     } else if (page_mode=="shiny") {
       str += "<p class=\"lead\">You are a Pokemon master! You have got all the shiny Pokemon.</p>";	
+    } else if (page_mode=="shadow") {
+        str += "<p class=\"lead\">You are a Pokemon master! You have got all the shadow Pokemon.</p>";	
     } else {
       str += "<p class=\"lead\">You are a Pokemon master! You have got a hundo of every single Pokemon.</p>";
     }
