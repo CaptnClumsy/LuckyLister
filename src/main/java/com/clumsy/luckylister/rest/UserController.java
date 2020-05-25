@@ -321,4 +321,67 @@ public class UserController {
     		throw new UserServiceException(e.getMessage());
 		}
 	}
+
+	@RequestMapping("/98/user/pokemon/{id}")
+	public List<UserDao> usersNinetyEight(@PathVariable("id") Long pokemonId, Principal principal) {
+		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+		try {
+			UserEntity user = userService.getCurrentUser(principal);
+			PokemonDao p = pokemonService.getPokemon(pokemonId);
+			List<UserDao> users = userService.getAllUsersWithNinetyEightPokemon(user, p.getDexid());
+			return users;
+		} catch (UserNotFoundException e) {
+    		throw new ObjectNotFoundException("Current user not found");
+    	} catch (UserAlreadyRegisteredException e) {
+    		throw new UserServiceException(e.getMessage());
+		}
+    }
+
+	@RequestMapping("/98/user/stats")
+	public TotalDao ninetyEightStats(Principal principal) {
+		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+		try {
+			UserEntity user = userService.getCurrentUser(principal);
+			TotalDao stats = userService.getNinetyEightStats(user);
+			return stats;
+		} catch (UserNotFoundException e) {
+			throw new ObjectNotFoundException("Current user not found");
+		} catch (UserAlreadyRegisteredException e) {
+			throw new UserServiceException(e.getMessage());
+		}
+    }
+
+	@RequestMapping(value = "/98/user/leaderboard")
+    public List<LeaderDao> getNinetyEightLeaderboard(Principal principal) {
+    	if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+    	try {
+    	    UserEntity user = userService.getCurrentUser(principal);
+		    return userService.getNinetyEightLeaderboard(user);
+    	} catch (UserNotFoundException e) {
+    		throw new ObjectNotFoundException("Current user not found");
+    	} catch (UserAlreadyRegisteredException e) {
+    		throw new UserServiceException(e.getMessage());
+		}
+	}
+
+	@RequestMapping(value = "/98/user/countboard")
+    public List<LeaderDao> getNinetyEightCountboard(Principal principal) {
+    	if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+    	try {
+    	    UserEntity user = userService.getCurrentUser(principal);
+		    return userService.getNinetyEightCountboard(user);
+    	} catch (UserNotFoundException e) {
+    		throw new ObjectNotFoundException("Current user not found");
+    	} catch (UserAlreadyRegisteredException e) {
+    		throw new UserServiceException(e.getMessage());
+		}
+	}
 }

@@ -28,6 +28,11 @@ public class RedirectHandler {
 	    return new ModelAndView("/hundo", model);
     }
 
+	@RequestMapping("/98/login/facebook")
+	public ModelAndView  ninetyEightLogin(ModelMap model) {
+	    return new ModelAndView("/98", model);
+    }
+
 	@RequestMapping("/shiny")
 	public ModelAndView  shinyPage(ModelMap model) {
 	    return new ModelAndView("/shiny_index.html", model);
@@ -43,4 +48,8 @@ public class RedirectHandler {
 	    return new ModelAndView("/hundo_index.html", model);
     }
 
+	@RequestMapping("/98")
+	public ModelAndView  ninetyEightPage(ModelMap model) {
+	    return new ModelAndView("/ninetyeight_index.html", model);
+    }
 }

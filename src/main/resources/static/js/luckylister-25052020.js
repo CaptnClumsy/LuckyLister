@@ -135,7 +135,7 @@ function initHome() {
 	var val = $(this).find('input').val();
     filterPokemon(val);
   });
-  if (page_mode=="hundo") {
+  if (page_mode=="hundo" || page_mode=="98") {
 	$(document).on('click', '.lucky-number-spinner button', pokemonTotalChanged);
 	$(document).on('keyup', '.lucky-number-spinner input', function () {
 	  clearTimeout(key_timeout);
@@ -147,6 +147,10 @@ function initHome() {
 	    var idStr = id.substr(prefix.length);
 	    updatePokemonTotal(idStr, newValue);
 	  }, 1000);
+	});
+	$('#hackett-close-btn').on('click', function (event) {
+		$('#hackett-banner').remove();
+		resize();
 	});
   }
 }
@@ -385,7 +389,7 @@ function getCellHtml(data, width, select) {
   str += " class=\""+imgClass+"\"></img>";
   str += "<span class=\"lucky-cell-label " + labelClass + "\">" + data.name + "</span>" +
 	"</button>\n";
-  if (page_mode=="hundo") {
+  if (page_mode=="hundo" || page_mode=="98") {
 	str += "<div class=\"input-group lucky-number-spinner\">";
 	if (select==true) {
 	  str += "<span class=\"input-group-btn\"><button class=\"btn btn-default lucky-small-btn-l\" data-dir=\"dwn\"><i class=\"fa fa-minus\"></i></button></span>";
@@ -539,11 +543,17 @@ function filterPokemon(filter) {
     } else if (page_mode=="shiny") {
       str += "<p class=\"lead\">You are a Pokemon master! You have got all the shiny Pokemon.</p>";	
     } else if (page_mode=="shadow") {
-        str += "<p class=\"lead\">You are a Pokemon master! You have got all the shadow Pokemon.</p>";	
+      str += "<p class=\"lead\">You are a Pokemon master! You have got all the shadow Pokemon.</p>";
+    } else if (page_mode=="98") {
+      str += "<p class=\"lead\">You are a Pokemon master! You have got all the almost perfect Pokemon.</p>";	
     } else {
       str += "<p class=\"lead\">You are a Pokemon master! You have got a hundo of every single Pokemon.</p>";
     }
-	str += "<div class=\"lucky-professor\"></div></div>";
+    if (page_mode=="98") {
+	    str += "<div class=\"lucky-professor-hackett\"></div></div>";    	
+    } else {
+	    str += "<div class=\"lucky-professor\"></div></div>";
+    }
     $('#got-them-all').html(str);
     $('#got-them-all').css("display","");
   } else {
@@ -554,7 +564,7 @@ function filterPokemon(filter) {
 
 function resetPercentage() {
   $.get(api_url+"/user/stats", function(data) {
-	  if (page_mode=="hundo") {
+	  if (page_mode=="hundo" || page_mode=="98") {
 		  $('#lucky-total').html(data.count);
 	  }
 	  var colors = getPercentageColors();
@@ -578,7 +588,7 @@ function getPercentageColors() {
 
 function showLeaderboard() {
     queryLeaderboard();
-    if (page_mode=="hundo") {
+    if (page_mode=="hundo" || page_mode=="98") {
       queryCountLeaderboard();
     }
 }
@@ -604,7 +614,7 @@ function queryLeaderboard() {
       	}
 	    leadersTable = $('#leadersTable').DataTable({
 	      "autoWidth": true,
-	      "scrollY": "400px",
+	      "scrollY": true,
 	      "scrollX": true,
 	      "searching": false,
 	      "lengthChange": false,
@@ -651,7 +661,7 @@ function queryCountLeaderboard() {
       	}
 	    countTable = $('#countTable').DataTable({
 	      "autoWidth": true,
-	      "scrollY": "400px",
+	      "scrollY": true,
 	      "scrollX": true,
 	      "searching": false,
 	      "lengthChange": false,
@@ -729,6 +739,13 @@ function resize() {
   var headerDiv = document.getElementById("lucky-nav-outer");
   var headerHeight = headerDiv.offsetHeight + 20; // for bit at bottom of iphone screen
 
+  if (page_mode=="98") {
+	  var hackettDiv = document.getElementById("hackett-banner");
+	  if (hackettDiv != null) {
+	    headerHeight += hackettDiv.offsetHeight;
+	  }
+  }
+
   // resize home page
   var gridHeader = document.getElementById("lucky-grid-header");
   var gridHeaderHeight = gridHeader.offsetHeight;
@@ -754,6 +771,14 @@ function resize() {
   var friendsHeader = document.getElementById("lucky-friends-help");
   var friendsHeaderHeight = headerHeight + friendsHeader.offsetHeight;
   setContentHeight("lucky-friends", friendsHeaderHeight);
+  
+  // resize leader page
+  var leaderHeight = headerHeight;
+  if (page_mode=="98" || page_mode=="hundo") {
+    var tabContainer = document.getElementById("lucky-leader-tab-pane");
+    leaderHeight += tabContainer.offsetHeight;
+  }
+  setContentHeight("leaderboard", leaderHeight);
 }
 
 function setContentHeight(id, height) {

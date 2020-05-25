@@ -96,4 +96,29 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
 	@Query("SELECT SUM(total) FROM UserHundoPokemonEntity t WHERE t.userid=?1")
 	Long findHundoCount(Long userid);
 
+	@Query("SELECT t FROM UserEntity t WHERE t.id != 0 AND " +
+			" t.id NOT IN (" +
+			  "SELECT l.userid FROM UserNinetyEightPokemonEntity l WHERE " +
+			  "l.pokemonid=?1) " +
+			"ORDER BY t.displayName ASC")
+	List<UserEntity> findAllNinetyEightByPokemonId(Long pokemonId);
+	
+	@Query("SELECT COUNT(*) FROM UserNinetyEightPokemonEntity t WHERE t.userid=?1")
+	Long findNinetyEight(Long userid);
+	
+	@Query("SELECT COUNT(*) FROM PokemonEntity t WHERE t.shiny=false AND t.shadow=false")
+	Long findNinetyEightTotal();
+	
+	@Query("SELECT u.id AS id, u.displayName AS displayName, COUNT(*) AS total " +
+			"FROM UserEntity u, UserNinetyEightPokemonEntity p WHERE p.userid=u.id " + 
+			"GROUP BY u.id ORDER BY total DESC, displayName DESC")
+	List<LeaderEntity> findNinetyEightLeaders();
+	
+	@Query("SELECT u.id AS id, u.displayName AS displayName, SUM(p.total) AS total " +
+			"FROM UserEntity u, UserNinetyEightPokemonEntity p WHERE p.userid=u.id " + 
+			"GROUP BY u.id ORDER BY total DESC, displayName DESC")
+	List<LeaderEntity> findNinetyEightCountLeaders();
+
+	@Query("SELECT SUM(total) FROM UserNinetyEightPokemonEntity t WHERE t.userid=?1")
+	Long findNinetyEightCount(Long userid);
 }

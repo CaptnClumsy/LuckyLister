@@ -17,12 +17,14 @@ import com.clumsy.luckylister.entities.PokemonEntity;
 import com.clumsy.luckylister.entities.UserEntity;
 import com.clumsy.luckylister.entities.UserHundoPokemonEntity;
 import com.clumsy.luckylister.entities.UserLuckyPokemonEntity;
+import com.clumsy.luckylister.entities.UserNinetyEightPokemonEntity;
 import com.clumsy.luckylister.entities.UserShadowPokemonEntity;
 import com.clumsy.luckylister.entities.UserShinyPokemonEntity;
 import com.clumsy.luckylister.exceptions.ObjectNotFoundException;
 import com.clumsy.luckylister.repos.PokemonRepo;
 import com.clumsy.luckylister.repos.UserHundoPokemonRepo;
 import com.clumsy.luckylister.repos.UserLuckyPokemonRepo;
+import com.clumsy.luckylister.repos.UserNinetyEightPokemonRepo;
 import com.clumsy.luckylister.repos.UserShadowPokemonRepo;
 import com.clumsy.luckylister.repos.UserShinyPokemonRepo;
 
@@ -34,16 +36,18 @@ public class PokemonService {
 	private final UserShinyPokemonRepo shinyPokemonRepo;
 	private final UserShadowPokemonRepo shadowPokemonRepo;
 	private final UserHundoPokemonRepo hundoPokemonRepo;
+	private final UserNinetyEightPokemonRepo ninetyeightPokemonRepo;
 	
 	@Autowired
 	PokemonService(final PokemonRepo pokemonRepo, final UserLuckyPokemonRepo luckyPokemonRepo,
 		final UserShinyPokemonRepo shinyPokemonRepo, final UserHundoPokemonRepo hundoPokemonRepo,
-		final UserShadowPokemonRepo shadowPokemonRepo) {
+		final UserShadowPokemonRepo shadowPokemonRepo, final UserNinetyEightPokemonRepo ninetyeightPokemonRepo) {
 		this.pokemonRepo = pokemonRepo;
 		this.luckyPokemonRepo = luckyPokemonRepo;
 		this.shinyPokemonRepo = shinyPokemonRepo;
 		this.hundoPokemonRepo = hundoPokemonRepo;
 		this.shadowPokemonRepo = shadowPokemonRepo;
+		this.ninetyeightPokemonRepo = ninetyeightPokemonRepo;
 	}
 
 	@Transactional(readOnly = true)
@@ -327,4 +331,62 @@ public class PokemonService {
 		return dao;
 	}
 
+	@Transactional(readOnly = true)
+	public List<PokemonDao> listNinetyEightPokemon(UserEntity user) {
+		final List<UserNinetyEightPokemonEntity> hundos = ninetyeightPokemonRepo.findByUserId(user.getId());
+		final Map<Long, UserNinetyEightPokemonEntity> hundoPokemon = 
+			hundos.stream().collect(Collectors.toMap(UserNinetyEightPokemonEntity::getPokemonid, item -> item));
+		final List<PokemonEntity> entities = pokemonRepo.findAllHundos();
+		List<PokemonDao> daos = new ArrayList<>(entities.size());
+		for (PokemonEntity entity : entities) {
+			final PokemonDao dao = PokemonDao.fromEntity(entity);
+			final UserNinetyEightPokemonEntity hundoEntry = hundoPokemon.get(dao.getId());
+			if (hundoEntry != null) {
+				dao.setDone(true);
+				dao.setTotal(hundoEntry.getTotal());
+			} else {
+				dao.setDone(false);
+				dao.setTotal(0L);
+			}
+			daos.add(dao);
+		}
+		return daos;
+	}
+
+	@Transactional
+	public PokemonDao updateNinetyEightPokemon(UserEntity user, Long pokemonId, boolean selected, Long total) throws ObjectNotFoundException {
+		// find if user already selected this pokemon and load the details for it		
+		final UserNinetyEightPokemonEntity entity = ninetyeightPokemonRepo.findByUserIdAndPokemonId(user.getId(), pokemonId);
+		final Optional<PokemonEntity> pokemonEntity = pokemonRepo.findById(pokemonId);
+		if (!pokemonEntity.isPresent()) {
+			throw new ObjectNotFoundException("Unable to find pokemon");
+		}
+		final PokemonDao dao = PokemonDao.fromEntity(pokemonEntity.get());
+		
+		if (!selected) {
+			dao.setDone(false);
+			dao.setTotal(0L);
+			// delete the row
+			if (entity!=null) {
+				ninetyeightPokemonRepo.delete(entity);
+			}
+			return dao;
+		} 
+
+		// check if already selected
+		dao.setDone(true);
+		if (entity!=null) {    
+	        entity.setTotal(total);
+	        dao.setTotal(total);
+	        ninetyeightPokemonRepo.save(entity);
+	        return dao;
+		}
+		// newly selected so we need to add a row
+		final UserNinetyEightPokemonEntity newEntity = new UserNinetyEightPokemonEntity();
+		newEntity.setPokemonid(pokemonId);
+		newEntity.setUserid(user.getId());
+		newEntity.setTotal(1L);
+		ninetyeightPokemonRepo.save(newEntity);
+		return dao;
+	}
 }

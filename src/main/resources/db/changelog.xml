@@ -16,5 +16,6 @@
   <include file="db/changelogs/shiny_pokemon.sql"/>
   <include file="db/changelogs/hundo_pokemon.sql"/>
   <include file="db/changelogs/shadow_pokemon.sql"/>
+  <include file="db/changelogs/ninetyeight_pokemon.sql"/>
 
 </databaseChangeLog>

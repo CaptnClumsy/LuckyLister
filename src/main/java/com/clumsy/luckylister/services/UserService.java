@@ -73,6 +73,10 @@ public class UserService {
 			// Check nobody with this name is already registered
 			UserEntity dupUser = userRepo.findOneByDisplayName(displayName);
 			if (dupUser!=null) {
+				// Al has two accounts, let him login with either of em
+				if (displayName.equalsIgnoreCase("Al Jarvis")) {
+					return dupUser;
+				}
 				throw new UserAlreadyRegisteredException("User with name "+displayName+" already exists");
 			}
 			// Automatically register the new user
@@ -376,5 +380,60 @@ public class UserService {
 		return leaders;
 	}
 
+	@Transactional(readOnly = true)
+	public List<UserDao> getAllUsersWithNinetyEightPokemon(UserEntity user, Long pokemonId) {
+		final List<UserEntity> users = userRepo.findAllNinetyEightByPokemonId(pokemonId);
+		if (users == null) {
+			return Collections.emptyList();
+		}
+		final Set<Long> allFriends = friendRepo.findAllByUser(user.getId());
+		List<UserDao> userDaos = new ArrayList<>(users.size());
+		for (UserEntity thisUser : users) {
+			UserDao userDao = UserDao.fromEntity(thisUser);
+			if (allFriends!=null && allFriends.contains(thisUser.getId())) {
+				userDao.setFriends(true);
+			}
+			userDaos.add(userDao);
+		}
+		Collections.sort(userDaos, (u1, u2) -> {
+			if (u1.isFriends() == u2.isFriends()) {
+				return u1.getDisplayName().compareTo(u2.getDisplayName());
+			}
+			return (u1.isFriends() ? -1 : 1);
+		});
+		return userDaos;
+	}
+
+	@Transactional(readOnly = true)
+	public TotalDao getNinetyEightStats(UserEntity user) {
+		Long total = userRepo.findNinetyEightTotal();
+		Long amount = userRepo.findNinetyEight(user.getId());
+		Long count = userRepo.findNinetyEightCount(user.getId());
+		return new TotalDao(total, amount, count);
+	}
+
+	@Transactional(readOnly = true)
+	public List<LeaderDao> getNinetyEightLeaderboard(UserEntity user) {
+		final List<LeaderEntity> leaderEntities = userRepo.findNinetyEightLeaders();
+		final List<LeaderDao> leaders = new ArrayList<>(leaderEntities.size());
+		int rank = 1;
+		for (LeaderEntity leaderEntity : leaderEntities) {
+			LeaderDao leader = new LeaderDao(rank++, leaderEntity.getDisplayName(), leaderEntity.getTotal());
+			leaders.add(leader);
+		}
+		return leaders;
+	}
+
+	@Transactional(readOnly = true)
+	public List<LeaderDao> getNinetyEightCountboard(UserEntity user) {
+		final List<LeaderEntity> leaderEntities = userRepo.findNinetyEightCountLeaders();
+		final List<LeaderDao> leaders = new ArrayList<>(leaderEntities.size());
+		int rank = 1;
+		for (LeaderEntity leaderEntity : leaderEntities) {
+			LeaderDao leader = new LeaderDao(rank++, leaderEntity.getDisplayName(), leaderEntity.getTotal());
+			leaders.add(leader);
+		}
+		return leaders;
+	}
 }
 

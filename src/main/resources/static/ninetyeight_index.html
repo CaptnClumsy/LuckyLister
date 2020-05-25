@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    
+    <meta name="viewport" content="width=375"/>
+    <!--
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no"/>
+    -->
+    
+    <title>LuckyLister</title>
+    
+    <meta property="og:type" content="website" />
+    <meta property="og:title" th:content="98Lister" />
+    <meta property="og:url" th:content="https://www.lucklister.com/98" />
+    <meta property="og:description" th:content="Track your ninety-eight percent Pokemon and see what Pokemon other trainers need. Compare your progress with other trainers and have fun trading!" />
+    <meta property="fb:app_id" content="882289415445644" />
+
+    <base href="/"/>
+ 
+    <link rel="stylesheet" type="text/css" href="/fontawesome/css/all.css" />
+    <link rel="stylesheet" type="text/css" href="/webjars/bootstrap/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/select2.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/datatables.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/luckylister.css"/>
+
+    <script type="text/javascript" src="/webjars/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="/webjars/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/webjars/js-cookie/js.cookie.js"></script>
+    <script type="text/javascript" src="/js/select2.full.min.js"></script>
+    <script type="text/javascript" src="/js/datatables.min.js"></script>
+    <script type="text/javascript" src="/js/luckylister-percentage.js"></script>
+    <script type="text/javascript" src="/js/luckylister-25052020.js"></script>
+
+</head>
+
+  <body>
+    <nav id ="lucky-nav-outer" class="navbar navbar-expand-sm navbar-static-top navbar-dark bg-primary lucky-top-nav">
+      <div class="lucky-left-nav">
+        <button class="dropdown-toggle btn btn-primary navbar-brand lucky-navbar-title lucky-nav-dropdown" type="button" id="navbar-title" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <img src="/images/ninetyeight.png" class="d-inline-block align-text-bottom" alt="" width="20" height="20">
+          98Lister
+        </button>
+        <div class="bg-primary dropdown-menu lucky-mode-menu" aria-labelledby="navbar-title">
+          <a class="btn navbar-brand lucky-navbar-title" id="navbar-lucky" href="/">
+            <img src="/images/clover.png" class="d-inline-block align-text-bottom" alt="" width="20" height="20">
+            LuckyLister
+          </a>
+          <a class="btn navbar-brand lucky-navbar-title" id="navbar-shiny" href="/shiny">
+            <img src="/images/shiny.png" class="d-inline-block align-text-bottom" alt="" width="20" height="20">
+            ShinyLister
+          </a>
+          <a class="btn navbar-brand lucky-navbar-title" id="navbar-shadow" href="/shadow">
+            <img src="/images/shadow.png" class="d-inline-block align-text-bottom" alt="" width="20" height="20">
+            ShadowLister
+          </a>
+           <a class="btn navbar-brand lucky-navbar-title" id="navbar-hundo" href="/hundo">
+            <img src="/images/hundo.png" class="d-inline-block align-text-bottom" alt="" width="20" height="20">
+            HundoLister
+          </a>
+        </div>
+        <div id="lucky-total" class="authenticated lucky-nav-total" style="display: none;"></div>
+        <div id="lucky-gold-percent" class="authenticated lucky-nav-percent" style="display: none;">
+        </div>
+      </div>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button> 
+      
+      <div id="navbarNav" class="navbar-collapse collapse">
+       <ul class="navbar-nav mr-auto">
+         <li class="nav-item">
+           <div id="lucky-nav-group" class="btn-group btn-group-toggle lucky-nav-group authenticated" data-toggle="buttons" style="display:none;">
+             <label class="btn btn-primary lucky-nav-button active">
+               <input type="radio" name="options" id="lucky-nav-home" autocomplete="off" value="HOME" checked>
+               <i class="fa fa-home"></i>
+             </label>
+             <label class="btn btn-primary lucky-nav-button">
+               <input type="radio" name="options" id="luck-nav-user" autocomplete="off" value="USER">
+               <i class="fa fa-user"></i>
+             </label>
+             <label class="btn btn-primary lucky-nav-button">
+               <input type="radio" name="options" id="lucky-nav-mon" autocomplete="off" value="POKEMON">
+               <i class="fa fa-question"></i>
+             </label>
+             <label class="btn btn-primary lucky-nav-button">
+               <input type="radio" name="options" id="lucky-nav-leader" autocomplete="off" value="LEADER">
+               <i class="fa fa-trophy"></i>
+             </label>
+           </div>
+         </li>
+        </ul>
+        <ul class="navbar-nav">
+          <li class="nav-item unauthenticated">
+            <a href="/98/login/facebook" class="btn btn-primary lucky-login-button"><i class="fab fa-facebook-f lucky-login-icon"></i>Login</a>
+          </li>
+          <li class="nav-link authenticated" style="display:none">
+            <div class="lucky-nav-dropdown">
+              <button class="dropdown-toggle btn btn-primary lucky-nav-dropdown" type="button" id="user" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              </button>
+              <div class="dropdown-menu lucky-user-menu" aria-labelledby="user">
+                <a class="btn btn-default dropdown-item" href="/tos.html">About</a>
+                <button class="dropdown-item" onClick="friends()">Friends</button>
+                <button class="dropdown-item" onClick="logout()">Logout</button>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="container fill lucky-container">
+
+      <div id="not-logged-in" class="unauthenticated hackett-container">
+        
+        <div class="lucky-grid-container" id="hackett-container">
+          <div class="lucky-grid">
+            <div class="jumbotron lucky-professor-jumbo">
+              <h2 class="display-5">Getting Started</h2>
+                <p class="lead">Login via Facebook using the link at the top of the page and start selecting your ninety-eight percent Pokemon (preferably with 15 attack) that you already own. You can also see which ninety-eight percent Pokemon other trainers need or check out the nintey eight percent leaderboard.</p>
+                <p class="lead"><b>Don't be a fool..appraise like Paul!</b></p>
+              <div class="hackett-gif"></div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+      
+      <div id="hackett-banner" class="hackett-area authenticated">
+        <div style="position: relative;">
+          <button id="hackett-close-btn" class="hackett-close">
+            <i class="far fa-times-circle"></i>
+          </button>
+        </div>
+        <div class="hackett-banner"></div>
+      </div>
+
+      <div id="lucky-home-page" class="authenticated" style="display:none">
+        <div id ="lucky-grid-header" class="lucky-grid-header">
+          <input type="text" id="lucky-searchbox" class="form-control lucky-searchbox" onkeyup="searchPokemon()" placeholder="Search by name..">
+          <div id="lucky-filter-group" class="btn-group btn-group-toggle lucky-button-group" data-toggle="buttons">
+            <label class="btn btn-info lucky-small-button active">
+              <input type="radio" name="options" id="lucky-filter-all" autocomplete="off" value="ALL">All
+            </label>
+            <label class="btn btn-info lucky-small-button">
+              <input type="radio" name="options" id="luck-filter-need" autocomplete="off" value="NEED">Need
+            </label>
+            <label class="btn btn-info lucky-small-button">
+              <input type="radio" name="options" id="lucky-filter-got" autocomplete="off" value="GOT">Got
+            </label>
+          </div>
+        </div>
+        <div class="lucky-grid-container" id="grid-container">
+          <div class="lucky-grid lucky-all" id="got-them-all" style="display:none"></div>
+          <div class="lucky-grid" id="pokemon"></div>
+        </div>
+      </div>
+    
+      <div id="lucky-user-page" style="display:none">
+      <div>
+        <div id="lucky-user-help" class="alert alert-info lucky-small-alert" role="alert">
+          Select the trainer you want to trade with to see what one hundred percent Pokemon they need.
+        </div>
+        <div id="lucky-user-search" class="lucky-user-search"><select id="user-search" name="user-search" class="form-control"><option></option></select></div>
+      </div>
+      <div class="lucky-grid-header" id="user-pokemon-header" style="display: none;">
+        <input type="text" id="lucky-user-searchbox" class="form-control lucky-searchbox" onkeyup="searchUserPokemon()" placeholder="Search by pokemon name..">
+      </div>
+      <div class="lucky-grid" id="user-pokemon" style="display: none;">
+      </div>
+      </div>
+
+      <div id="lucky-pokemon-page" style="display:none">
+      <div>
+        <div id="lucky-question-help" class="alert alert-info lucky-small-alert" role="alert">
+          Select the Pokemon you want to trade to see who needs it for their 98% collection.
+        </div>
+        <div id="lucky-question-search" class="lucky-question-search"><select id="question-search" name="question-search" class="form-control"><option></option></select></div>
+      </div>
+      <div class="lucky-grid" id="question-users" style="display: none;">
+      </div>
+      </div>
+
+      <div id="lucky-friends-page" style="display:none">
+      <div>
+        <div id="lucky-friends-help" class="alert alert-info lucky-small-alert" role="alert">
+          Select the trainers that you trade with the most to limit which users you see.
+        </div>
+      </div>
+      <div class="lucky-grid" id="lucky-friends">
+      </div>
+      </div>
+
+      <div id="lucky-leader-page" style="display:none">
+      <span id="lucky-leader-tab-pane" class="lucky-leader-tab-container">
+        <ul class="nav nav-tabs lucky-tab-list" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active lucky-leader-tab-label" data-toggle="tab" href="#completeLeaderboard" role="tab" aria-selected="true">Complete</a>
+          </li>
+          <li class="nav-item">
+            <a id="totalTab" class="nav-link lucky-leader-tab-label" data-toggle="tab" href="#countLeaderboard" role="tab" aria-selected="false">Count</a>
+          </li>
+        </ul>
+      </span>
+      <div id="leaderboard" class="tab-content lucky-leader-pane scrollable">
+        <div class="tab-pane active" id="completeLeaderboard" role="tabpanel">
+          <table id="leadersTable" class="table lucky-lead-table" style="width: 100%;">
+            <thead style="display:none;">
+              <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Lucky</th>
+              </tr>
+            </thead>
+            <tbody id="leadersTableBody" class="lucky-lead-table-body"></tbody>
+          </table>
+        </div>
+        <div class="tab-pane lucky-leader-pane" id="countLeaderboard" role="tabpanel">
+          <table id="countTable" class="table lucky-lead-table scrollable" style="width: 100%;">
+            <thead style="display:none;">
+              <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Lucky</th>
+              </tr>
+            </thead>
+            <tbody id="countTableBody" class="lucky-lead-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+      </div>
+
+    <div class="modal fade" id="errorPage" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 id="errorPageTitle" class="modal-title"></h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p id="errorPageBody"></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>   
+      </div>
+    </div>
+    
+    </div>
+    
+    <script type="text/javascript">
+      initPage("98");
+    </script>
+
+  </body>
+</html>

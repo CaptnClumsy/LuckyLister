@@ -4,6 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
@@ -21,11 +22,16 @@ public class LuckyListerApplication extends WebSecurityConfigurerAdapter {
 	      .antMatcher("/**")
 	      .authorizeRequests()
 	        .antMatchers("/", "/tos**", "/login**", "/webjars/**", 
-	        	"/error**", "/images/**", "/js/**", "/css/**")
+	        	"/error**", "/images/**", "/js/**", "/css/**", "/fontawesome/**")
 	        .permitAll()
 	      .anyRequest()
 	        .authenticated()
 	        .and().logout().logoutSuccessUrl("/").permitAll()
 	        .and().csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
     }
+
+	@Override
+	public void configure(WebSecurity web) throws Exception {
+	    web.ignoring().antMatchers("/images/**");
+	}
 }

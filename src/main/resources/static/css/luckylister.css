@@ -369,3 +369,53 @@ body {
 .lucky-tab-list {
 	margin-top: 4px;
 }
+.hackett-container {
+	display: flex;
+	height: 100%;
+}
+.hackett-gif {
+	background-image: url('/images/Hackett.gif');
+	width: 100%;
+	height: 100%;
+	display: block;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+.hackett-area {
+	margin-left: auto;
+    margin-right: auto;
+    margin-top: 2px;
+    width: 375px;
+}
+.hackett-banner {
+	background: url('/images/Hackett.gif') no-repeat center;
+	background-repeat: no-repeat;
+	background-size: cover;
+	margin-top: 0px;
+	margin-bottom: 0px;
+	width: 375px;
+    height: 180px;
+}
+.hackett-close {
+    float: right;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    background-color: Transparent;
+    background-repeat: no-repeat;
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
+    padding: 2px;
+}
+.lucky-professor-hackett {
+	background-image: url('/images/ProfessorHackett.png');
+	width: 100%;
+	height: 100%;
+	display: block;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+.lucky-leader-pane {
+	overflow: auto;
+}
