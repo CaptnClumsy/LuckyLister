@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.clumsy.luckylister.data.PokemonDao;
-import com.clumsy.luckylister.data.SelectListDao;
+import com.clumsy.luckylister.data.PokemonSelectListDao;
 import com.clumsy.luckylister.data.UpdatePokemonDao;
 import com.clumsy.luckylister.entities.UserEntity;
 import com.clumsy.luckylister.exceptions.NotLoggedInException;
@@ -82,12 +82,12 @@ public class PokemonController {
     }
 
 	@RequestMapping("/pokemon/all")
-	public List<SelectListDao> listAllPokemon(Principal principal) {
+	public List<PokemonSelectListDao> listAllPokemon(Principal principal) {
 		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
     		throw new NotLoggedInException();
     	}
 		try {
-			List<SelectListDao> pokemon = pokemonService.listAllPokemon();
+			List<PokemonSelectListDao> pokemon = pokemonService.listAllPokemon();
 			return pokemon;
 		} catch (ObjectNotFoundException e) {
 			throw new ObjectNotFoundException("No Pokemon found");
@@ -95,12 +95,12 @@ public class PokemonController {
     }
 	
 	@RequestMapping("/shiny/pokemon/all")
-	public List<SelectListDao> listAllShinyPokemon(Principal principal) {
+	public List<PokemonSelectListDao> listAllShinyPokemon(Principal principal) {
 		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
     		throw new NotLoggedInException();
     	}
 		try {
-			List<SelectListDao> pokemon = pokemonService.listAllPokemon();
+			List<PokemonSelectListDao> pokemon = pokemonService.listAllShinyPokemon();
 			return pokemon;
 		} catch (ObjectNotFoundException e) {
 			throw new ObjectNotFoundException("No Pokemon found");
@@ -108,12 +108,12 @@ public class PokemonController {
     }
 	
 	@RequestMapping("/hundo/pokemon/all")
-	public List<SelectListDao> listAllHundoPokemon(Principal principal) {
+	public List<PokemonSelectListDao> listAllHundoPokemon(Principal principal) {
 		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
     		throw new NotLoggedInException();
     	}
 		try {
-			List<SelectListDao> pokemon = pokemonService.listAllPokemon();
+			List<PokemonSelectListDao> pokemon = pokemonService.listAllHundoPokemon();
 			return pokemon;
 		} catch (ObjectNotFoundException e) {
 			throw new ObjectNotFoundException("No Pokemon found");
@@ -121,17 +121,17 @@ public class PokemonController {
     }
 	
 	@RequestMapping("/98/pokemon/all")
-	public List<SelectListDao> listAllNinetyEightPokemon(Principal principal) {
+	public List<PokemonSelectListDao> listAllNinetyEightPokemon(Principal principal) {
 		return listAllHundoPokemon(principal);
     }
 	
 	@RequestMapping("/shadow/pokemon/all")
-	public List<SelectListDao> listAllShadowPokemon(Principal principal) {
+	public List<PokemonSelectListDao> listAllShadowPokemon(Principal principal) {
 		if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
     		throw new NotLoggedInException();
     	}
 		try {
-			List<SelectListDao> pokemon = pokemonService.listAllShadowPokemon();
+			List<PokemonSelectListDao> pokemon = pokemonService.listAllShadowPokemon();
 			return pokemon;
 		} catch (ObjectNotFoundException e) {
 			throw new ObjectNotFoundException("No Pokemon found");

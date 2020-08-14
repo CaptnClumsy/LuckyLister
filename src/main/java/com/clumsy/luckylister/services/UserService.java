@@ -16,16 +16,19 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.clumsy.luckylister.data.FilterDao;
 import com.clumsy.luckylister.data.FriendDao;
 import com.clumsy.luckylister.data.LeaderDao;
 import com.clumsy.luckylister.data.TotalDao;
 import com.clumsy.luckylister.data.UserDao;
+import com.clumsy.luckylister.entities.FilterEntity;
 import com.clumsy.luckylister.entities.FriendEntity;
 import com.clumsy.luckylister.entities.LeaderEntity;
 import com.clumsy.luckylister.entities.UserEntity;
 import com.clumsy.luckylister.entities.UserShinyCountEntity;
 import com.clumsy.luckylister.exceptions.UserAlreadyRegisteredException;
 import com.clumsy.luckylister.exceptions.UserNotFoundException;
+import com.clumsy.luckylister.repos.FilterRepo;
 import com.clumsy.luckylister.repos.FriendRepo;
 import com.clumsy.luckylister.repos.PokemonRepo;
 import com.clumsy.luckylister.repos.UserRepo;
@@ -38,12 +41,15 @@ public class UserService {
 	private final UserRepo userRepo;
 	private final FriendRepo friendRepo;
 	private final PokemonRepo pokemonRepo;
+	private final FilterRepo filterRepo;
 	
 	@Autowired
-	UserService(final UserRepo userRepo, final FriendRepo friendRepo, final PokemonRepo pokemonRepo) {
+	UserService(final UserRepo userRepo, final FriendRepo friendRepo,
+			final PokemonRepo pokemonRepo, final FilterRepo filterRepo) {
 		this.userRepo = userRepo;
 		this.friendRepo = friendRepo;
 		this.pokemonRepo = pokemonRepo;
+		this.filterRepo = filterRepo;
 	}
 	
 	@Transactional(readOnly = true)
@@ -84,9 +90,23 @@ public class UserService {
 			newUser.setName(principal.getName());
 			newUser.setDisplayName(displayName);
 			newUser.setAdmin(false);
-			newUser.setCostumes(true);
-			
 			UserEntity savedUser = userRepo.save(newUser);
+			
+			FilterEntity newFilter = new FilterEntity();
+			newFilter.setUserid(savedUser.getId());
+			newFilter.setShiny_costumes(true);
+			newFilter.setShiny_shadows(true);
+			newFilter.setShiny_alolan(true);
+			newFilter.setShiny_other(true);
+			newFilter.setLucky_costumes(false);
+			newFilter.setLucky_alolan(false);
+			newFilter.setLucky_other(true);
+			newFilter.setHundo_costumes(false);
+			newFilter.setHundo_shadows(false);
+			newFilter.setHundo_alolan(false);
+			newFilter.setHundo_other(true);
+			filterRepo.save(newFilter);
+			
 			return savedUser;
 		}
 		return user;
@@ -127,8 +147,21 @@ public class UserService {
 
 	@Transactional(readOnly = true)
 	public TotalDao getStats(UserEntity user) {
-		Long total = userRepo.findTotal();
-		Long amount = userRepo.findLucky(user.getId());
+		FilterEntity filter = filterRepo.findByUserId(user.getId());
+		Long total = 0L;
+		if (filter.getLucky_other())
+		    total += userRepo.findTotal();
+		if (filter.getLucky_costumes())
+			total += userRepo.findLuckyCostumeTotal();
+		if (filter.getLucky_alolan())
+			total += userRepo.findLuckyAlolanTotal();
+		Long amount = 0L;
+		if (filter.getLucky_other())
+			amount += userRepo.findLucky(user.getId());
+		if (filter.getLucky_costumes())
+			amount += userRepo.findLuckyCostume(user.getId());
+		if (filter.getLucky_alolan())
+			amount += userRepo.findLuckyAlolan(user.getId());		
 		return new TotalDao(total, amount);
 	}
 
@@ -213,8 +246,25 @@ public class UserService {
 	
 	@Transactional(readOnly = true)
 	public TotalDao getShinyStats(UserEntity user) {
-		Long total = userRepo.findShinyTotal();
-		Long amount = userRepo.findShiny(user.getId());
+		FilterEntity filter = filterRepo.findByUserId(user.getId());
+		Long total = 0L;
+		if (filter.getShiny_other())
+		    total += userRepo.findShinyTotal();
+		if (filter.getShiny_costumes())
+			total += userRepo.findShinyCostumeTotal();
+		if (filter.getShiny_shadows())
+			total += userRepo.findShinyShadowTotal();
+		if (filter.getShiny_alolan())
+			total += userRepo.findShinyAlolanTotal();
+		Long amount = 0L;
+		if (filter.getShiny_other())
+			amount += userRepo.findShiny(user.getId());
+		if (filter.getShiny_costumes())
+			amount += userRepo.findShinyCostume(user.getId());
+		if (filter.getShiny_shadows())
+			amount += userRepo.findShinyShadow(user.getId());
+		if (filter.getShiny_alolan())
+			amount += userRepo.findShinyAlolan(user.getId());
 		return new TotalDao(total, amount);
 	}
 
@@ -317,11 +367,36 @@ public class UserService {
 
 
 	@Transactional
-	public UserDao updateUser(UserEntity user, boolean costumes) throws UserNotFoundException {
+	public FilterDao updateUser(UserEntity user, FilterDao filter) throws UserNotFoundException {
 		UserEntity myUserEntity = userRepo.getOne(user.getId());
-		myUserEntity.setCostumes(costumes);
-		UserEntity savedUser = userRepo.save(myUserEntity);
-		return UserDao.fromEntity(savedUser);
+		if (myUserEntity==null) {
+			throw new UserNotFoundException("Specified user does not exist");
+		}
+		FilterEntity myFilter = filterRepo.findByUserId(myUserEntity.getId());
+		if (filter.getShiny_costumes()!=null)
+		  myFilter.setShiny_costumes(filter.getShiny_costumes());
+		if (filter.getShiny_shadows()!=null)
+		  myFilter.setShiny_shadows(filter.getShiny_shadows());
+		if (filter.getShiny_alolan()!=null)
+		  myFilter.setShiny_alolan(filter.getShiny_alolan());
+		if (filter.getShiny_other()!=null)
+		  myFilter.setShiny_other(filter.getShiny_other());
+		if (filter.getLucky_costumes()!=null)
+		  myFilter.setLucky_costumes(filter.getLucky_costumes());
+		if (filter.getLucky_alolan()!=null)
+		  myFilter.setLucky_alolan(filter.getLucky_alolan());
+		if (filter.getLucky_other()!=null)
+		  myFilter.setLucky_other(filter.getLucky_other());
+		if (filter.getHundo_costumes()!=null)
+		  myFilter.setHundo_costumes(filter.getHundo_costumes());
+		if (filter.getHundo_shadows()!=null)
+		  myFilter.setHundo_shadows(filter.getHundo_shadows());
+		if (filter.getHundo_alolan()!=null)
+		  myFilter.setHundo_alolan(filter.getHundo_alolan());
+		if (filter.getHundo_other()!=null)
+		  myFilter.setHundo_other(filter.getHundo_other());
+		FilterEntity savedFilter = filterRepo.save(myFilter);
+		return FilterDao.fromEntity(savedFilter);
 	}
 
 	@Transactional(readOnly = true)
@@ -350,10 +425,41 @@ public class UserService {
 
 	@Transactional(readOnly = true)
 	public TotalDao getHundoStats(UserEntity user) {
-		Long total = userRepo.findHundoTotal();
-		Long amount = userRepo.findHundo(user.getId());
-		Long count = userRepo.findHundoCount(user.getId());
+		FilterEntity filter = filterRepo.findByUserId(user.getId());
+		Long total = 0L;
+		if (filter.getHundo_other())
+		    total += userRepo.findHundoTotal();
+		if (filter.getHundo_costumes())
+			total += userRepo.findHundoCostumeTotal();
+		if (filter.getHundo_shadows())
+			total += userRepo.findHundoShadowTotal();
+		if (filter.getHundo_alolan())
+			total += userRepo.findHundoAlolanTotal();
+		Long amount = 0L;
+		if (filter.getHundo_other())
+			amount += userRepo.findHundo(user.getId());
+		if (filter.getHundo_costumes())
+			amount += userRepo.findHundoCostume(user.getId());
+		if (filter.getHundo_shadows())
+			amount += userRepo.findHundoShadow(user.getId());
+		if (filter.getHundo_alolan())
+			amount += userRepo.findHundoAlolan(user.getId());
+        Long count = 0L;
+        if (filter.getHundo_other())
+			count += safeAdd(userRepo.findHundoCount(user.getId()));
+		if (filter.getHundo_costumes())
+			count += safeAdd(userRepo.findHundoCostumeCount(user.getId()));
+		if (filter.getHundo_shadows())
+			count += safeAdd(userRepo.findHundoShadowCount(user.getId()));
+		if (filter.getHundo_alolan())
+			count += safeAdd(userRepo.findHundoAlolanCount(user.getId()));
 		return new TotalDao(total, amount, count);
+	}
+
+	private long safeAdd(Long amount) {
+		if (amount==null)
+			return 0;
+		return amount;
 	}
 
 	@Transactional(readOnly = true)
@@ -434,6 +540,16 @@ public class UserService {
 			leaders.add(leader);
 		}
 		return leaders;
+	}
+
+	@Transactional(readOnly = true)
+	public FilterDao getFilter(final Long userId) throws UserNotFoundException {
+		UserEntity myUserEntity = userRepo.getOne(userId);
+		if (myUserEntity==null) {
+			throw new UserNotFoundException("Specified user does not exist");
+		}
+		FilterEntity myFilter = filterRepo.findByUserId(myUserEntity.getId());
+		return FilterDao.fromEntity(myFilter);
 	}
 }
 

@@ -58,24 +58,28 @@ body {
 	border-color: white;
 	width: 36px;
 }
-.lucky-hat-btn {
+.lucky-filter-dropdown {
+	position: relative;
+	display: inline-flex;
+}
+.lucky-filter-btn {
 	font-size: 24px;
 	width: 36px;
-    margin-left: 8px;
     padding-left: 4px;
     padding-right: 4px;
     padding-top: 3px;
     padding-bottom: 3px;
-    color: #101010;
 }
-.lucky-hat-btn:hover {
-	color: #101010;
+.lucky-filter-item {
+    padding-left: 8px;	
 }
-.lucky-hat-btn:hover .active {
-	color: white;
+.lucky-filter-icon {
+	padding-right: 16px;
 }
-.lucky-hat-btn .active {
-	color: white;
+.lucky-cell-shadow {
+	position: absolute;
+    bottom: 14px;
+    left: 2px;
 }
 .lucky-nav-gap {
 	margin-top: 6px;

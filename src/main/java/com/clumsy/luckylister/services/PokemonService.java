@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.clumsy.luckylister.data.PokemonDao;
-import com.clumsy.luckylister.data.SelectListDao;
+import com.clumsy.luckylister.data.PokemonSelectListDao;
 import com.clumsy.luckylister.entities.PokemonEntity;
 import com.clumsy.luckylister.entities.UserEntity;
 import com.clumsy.luckylister.entities.UserHundoPokemonEntity;
@@ -112,28 +112,56 @@ public class PokemonService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<SelectListDao> listAllPokemon() throws ObjectNotFoundException {
+	public List<PokemonSelectListDao> listAllPokemon() throws ObjectNotFoundException {
 		final List<PokemonEntity> entities = pokemonRepo.findAll();
 		if (entities==null) {
 			throw new ObjectNotFoundException("Unable to find pokemon");
 		}
-		List<SelectListDao> daos = new ArrayList<>(entities.size());
+		List<PokemonSelectListDao> daos = new ArrayList<>(entities.size());
 		for (PokemonEntity entity : entities) {
-			final SelectListDao dao = SelectListDao.fromPokemonEntity(entity);
+			final PokemonSelectListDao dao = PokemonSelectListDao.fromPokemonEntity(entity);
 			daos.add(dao);
 		}
 		return daos;
 	}
 	
 	@Transactional(readOnly = true)
-	public List<SelectListDao> listAllShadowPokemon() throws ObjectNotFoundException {
+	public List<PokemonSelectListDao> listAllShinyPokemon() throws ObjectNotFoundException {
+		final List<PokemonEntity> entities = pokemonRepo.findAllShiny();
+		if (entities==null) {
+			throw new ObjectNotFoundException("Unable to find pokemon");
+		}
+		List<PokemonSelectListDao> daos = new ArrayList<>(entities.size());
+		for (PokemonEntity entity : entities) {
+			final PokemonSelectListDao dao = PokemonSelectListDao.fromPokemonEntity(entity);
+			daos.add(dao);
+		}
+		return daos;
+	}
+
+	@Transactional(readOnly = true)
+	public List<PokemonSelectListDao> listAllShadowPokemon() throws ObjectNotFoundException {
 		final List<PokemonEntity> entities = pokemonRepo.findAllShadow();
 		if (entities==null) {
 			throw new ObjectNotFoundException("Unable to find pokemon");
 		}
-		List<SelectListDao> daos = new ArrayList<>(entities.size());
+		List<PokemonSelectListDao> daos = new ArrayList<>(entities.size());
 		for (PokemonEntity entity : entities) {
-			final SelectListDao dao = SelectListDao.fromPokemonEntity(entity);
+			final PokemonSelectListDao dao = PokemonSelectListDao.fromPokemonEntity(entity);
+			daos.add(dao);
+		}
+		return daos;
+	}
+	
+	@Transactional(readOnly = true)
+	public List<PokemonSelectListDao> listAllHundoPokemon() throws ObjectNotFoundException {
+		final List<PokemonEntity> entities = pokemonRepo.findAllHundos();
+		if (entities==null) {
+			throw new ObjectNotFoundException("Unable to find pokemon");
+		}
+		List<PokemonSelectListDao> daos = new ArrayList<>(entities.size());
+		for (PokemonEntity entity : entities) {
+			final PokemonSelectListDao dao = PokemonSelectListDao.fromPokemonEntity(entity);
 			daos.add(dao);
 		}
 		return daos;

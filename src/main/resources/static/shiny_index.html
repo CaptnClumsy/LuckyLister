@@ -27,7 +27,7 @@
     <script type="text/javascript" src="/js/select2.full.min.js"></script>
     <script type="text/javascript" src="/js/datatables.min.js"></script>
     <script type="text/javascript" src="/js/luckylister-percentage.js"></script>
-    <script type="text/javascript" src="/js/luckylister-25052020.js"></script>
+    <script type="text/javascript" src="/js/luckylister-13082020.js"></script>
 
 </head>
 
@@ -86,9 +86,19 @@
                <i class="fa fa-trophy"></i>
              </label>
            </div>
-           <button type="button" class="btn btn-primary active lucky-hat-btn" id="lucky-hat-btn" data-toggle="button" aria-pressed="true" autocomplete="off">
-             <i class="fab fa-redhat"></i>
-           </button>
+           <div class="lucky-filter-dropdown authenticated" style="display:none;">
+             <div>
+               <button type="button" class="btn btn-primary lucky-filter-btn" id="lucky-filter-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                 <i class="fas fa-angle-double-down"></i>
+               </button>
+               <div class="dropdown-menu lucky-filter-menu" aria-labelledby="lucky-filter-btn">
+                  <button class="dropdown-item lucky-filter-item" id="lucky-hat-btn"><i class="fab fa-redhat lucky-filter-icon"></i>Hats/Costumes</button>
+                  <button class="dropdown-item lucky-filter-item" id="lucky-shadow-btn"><i class="fab fa-gripfire lucky-filter-icon"></i>Shadows</button>
+                  <button class="dropdown-item lucky-filter-item" id="lucky-alolan-btn"><i class="fas fa-globe-europe lucky-filter-icon"></i>Alolan</button> 
+                  <button class="dropdown-item lucky-filter-item" id="lucky-other-btn"><i class="fas fa-splotch lucky-filter-icon"></i>Other</button>
+                </div>
+             </div>
+           </div>
          </li>
         </ul>
         <ul class="navbar-nav">

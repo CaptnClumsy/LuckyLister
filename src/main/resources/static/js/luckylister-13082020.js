@@ -4,7 +4,13 @@ var userSelect = null;
 var page_mode = "";
 var api_url = "";
 var current_view = "HOME";
-var include_hats = true;
+var filter = {
+  costumes: true,
+  shadows: true,
+  alolan: true,
+  other: true
+  
+};
 var key_timeout = null;
 
 function initPage(mode) {
@@ -31,11 +37,8 @@ function initPage(mode) {
     contentType: "application/json; charset=utf-8",
 	url: "/user",
 	success: function (data) {
-	  include_hats=data.costumes;
-	  $('#lucky-hat-btn').removeClass('active');
-	  if (include_hats) {
-	      $('#lucky-hat-btn').addClass('active');
-	  }
+	  filterFromDao(data.filter);
+	  updateFilter();
 	  $("#user").html(data.displayName);
 	  $(".unauthenticated").hide();
 	  $(".authenticated").show();
@@ -54,32 +57,128 @@ function initPage(mode) {
   window.onresize = resize;
 }
 
+function filterFromDao(filterDao) {
+  if (page_mode=="shadow") {
+	filter.costumes=true;
+	filter.shadows=true;
+	filter.alolan=true;
+	filter.other=true;
+  } else if (page_mode=="shiny") {
+	filter.costumes=filterDao.shiny_costumes;
+	filter.shadows=filterDao.shiny_shadows;
+	filter.alolan=filterDao.shiny_alolan;
+	filter.other=filterDao.shiny_other;
+  }	
+  else if (page_mode=="hundo" || page_mode=="98") {
+	filter.costumes=filterDao.hundo_costumes;
+	filter.shadows=filterDao.hundo_shadows;
+	filter.alolan=filterDao.hundo_alolan;
+	filter.other=filterDao.hundo_other;
+  } else {
+	filter.costumes=filterDao.lucky_costumes;
+	filter.shadows=false;
+	filter.alolan=filterDao.lucky_alolan;
+	filter.other=filterDao.lucky_other;
+  }
+}
+
+function toFilterDao() {
+  var filterDao = {};
+  if (page_mode=="shiny") {
+	filterDao.shiny_costumes=filter.costumes;
+	filterDao.shiny_shadows=filter.shadows;
+	filterDao.shiny_alolan=filter.alolan;
+	filterDao.shiny_other=filter.other;
+  }	
+  else if (page_mode=="hundo" || page_mode=="98") {
+	filterDao.hundo_costumes=filter.costumes;
+	filterDao.hundo_shadows=filter.shadows;
+	filterDao.hundo_alolan=filter.alolan;
+	filterDao.hundo_other=filter.other;
+  } else {
+	filterDao.lucky_costumes=filter.costumes;
+	filterDao.lucky_alolan=filter.alolan;
+	filterDao.lucky_other=filter.other;
+  }
+  return filterDao;
+}
+
+function updateFilter() {
+	$('#lucky-hat-btn').removeClass('active');
+	$('#lucky-shadow-btn').removeClass('active');
+	$('#lucky-alolan-btn').removeClass('active');
+	$('#lucky-other-btn').removeClass('active');
+	if (filter.costumes) {
+	    $('#lucky-hat-btn').addClass('active');
+	}
+	if (filter.shadows) {
+	    $('#lucky-shadow-btn').addClass('active');
+	}
+	if (filter.alolan) {
+	    $('#lucky-alolan-btn').addClass('active');
+	}
+	if (filter.other) {
+	    $('#lucky-other-btn').addClass('active');
+	}
+	$('#lucky-filter-btn').removeClass('active');
+	if (page_mode=="shiny" || page_mode=="hundo" || page_mode=="98") { 
+		if (!filter.costumes || !filter.shadows || !filter.alolan || filter.other==false)
+	      $('#lucky-filter-btn').addClass('active');
+	} else {
+		if (filter.costumes || filter.alolan || filter.other==false)
+		  $('#lucky-filter-btn').addClass('active');
+	}
+	
+}
+
 function initNavbar() {
-  $('#lucky-nav-group .btn').on('click', function(event) {
-    current_view = $(this).find('input').val();
-	showView(current_view);
-  });
-  $('#lucky-hat-btn').on('click', function(event) {
-	var val = $(this).hasClass('active');
-	include_hats=!val;
-    var data = { costumes: include_hats };
-	$.ajax({
-	  type: "POST",
-	  contentType: "application/json; charset=utf-8",
-	  url: "/user/prefs",
-	  data: JSON.stringify(data),
-	  success: function (data) {
-	    if (current_view=="HOME") {
-		  showHome();
-		} else if (current_view=="USER") {
-		  showUser();
-		}
-	  },
-	  error: function (result) {
-	    errorPage("Failed to update preferences", result);
-	  }
+	$('#lucky-nav-group .btn').on('click', function(event) {
+	    current_view = $(this).find('input').val();
+		showView(current_view);
 	});
-  });
+	$('#lucky-hat-btn').on('click', function(event) {
+		var val = $(this).hasClass('active');
+		filter.costumes=!val;
+	    filterChanged();
+	});
+	$('#lucky-shadow-btn').on('click', function(event) {
+		var val = $(this).hasClass('active');
+		filter.shadows=!val;
+	    filterChanged();
+	});
+	$('#lucky-alolan-btn').on('click', function(event) {
+	    var val = $(this).hasClass('active');
+		filter.alolan=!val;
+		filterChanged();
+    });
+	$('#lucky-other-btn').on('click', function(event) {
+	    var val = $(this).hasClass('active');
+		filter.other=!val;
+		filterChanged();
+    });
+}
+
+function filterChanged() {
+	filterDao = toFilterDao();
+	$.ajax({
+	    type: "POST",
+		contentType: "application/json; charset=utf-8",
+		url: "/user/prefs",
+		data: JSON.stringify(filterDao),
+		success: function (data) {
+			updateFilter();		  
+			if (current_view=="HOME") {
+			    showHome();
+			} else if (current_view=="USER") {
+			    showUser();
+			} else {
+				resetPercentage();
+			}
+        },
+	    error: function (result) {
+	        errorPage("Failed to update preferences", result);
+	    }
+    });
 }
 
 function showView(view) {
@@ -242,7 +341,16 @@ function showUserPokemon(id) {
 	var str = "";
 	if (data.length!=0) {
 	  for (var i=0; i<data.length; i++) {
-		if (!include_hats && data[i].costume!==0) {
+		if (!filter.costumes && data[i].costume!==0) {
+	      continue;
+	    }
+		if (!filter.shadows && data[i].shadow!==false) {
+		  continue;
+		}
+		if (!filter.alolan && data[i].region!==0) {
+		  continue;
+	    }
+		if (!filter.other && data[i].costume==0 && data[i].shadow==false && data[i].region==0) {
 	      continue;
 	    }
 	    str += "<div class=\"lucky-pokemon-cell\" id=\"user-pokemon-" + data[i].id + "\">";
@@ -269,7 +377,19 @@ function initPokemon() {
 	  $('#question-search').select2({
 	    placeholder: "Select a Pokemon",
 	    width: '90%',
-	    data: data
+	    data: data,
+	    templateResult: function(data) {
+	      var iconClass = "fas fa-splotch";
+	      if (data.costume!==undefined && data.costume!=0) {
+	    	  iconClass = "fab fa-redhat";
+	      } else if (data.shadow!==undefined && data.shadow==true) {
+	          iconClass = "fab fa-gripfire";
+	      } else if (data.region!==undefined && data.region!=0) {
+	    	  iconClass = "fas fa-globe-europe";
+	      }
+	      var element = $("<button class=\"dropdown-item lucky-filter-item\"><i class=\"lucky-filter-icon "+iconClass+"\"></i>"+data.text+"</button>");
+	      return element;
+	    }
 	  });
 	  $('#question-search').on("select2:select", function(e) {
 	    $("#question-users").show();
@@ -319,7 +439,16 @@ function showHome() {
     $("#pokemon").html("");
     var str = "";
     for (var i=0; i<data.length; i++) {
-      if (!include_hats && data[i].costume!==0) {
+      if (!filter.costumes && data[i].costume!==0) {
+    	  continue;
+      }
+      if (!filter.shadows && data[i].shadow!==false) {
+		  continue;
+	  }
+      if (!filter.alolan && data[i].region!==0) {
+		  continue;
+	  }
+      if (!filter.other && data[i].costume==0 && data[i].shadow==false && data[i].region==0) {
     	  continue;
       }
       str += "<div class=\"lucky-pokemon-cell\" id=\"pokemon-" + data[i].id + "\">";
@@ -379,6 +508,13 @@ function getCellHtml(data, width, select) {
   if (data.done===true) {
 	labelClass = "lucky-got";
 	str += "<img class=\"lucky-cell-tick\" src=\"images/tickmark.png\"></img>";
+  }
+  if (data.shadow===true) {
+	str += "<img class=\"lucky-cell-shadow\" src=\"images/ic_shadow";
+	if (data.done!==true) {
+	  str += "_d";
+	}
+	str += ".png\"></img>";	  
   }
   var image_url = getImageUrl(data);
   str += "<img src=\"" + image_url + "\" ";
