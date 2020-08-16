@@ -18,5 +18,6 @@
   <include file="db/changelogs/shadow_pokemon.sql"/>
   <include file="db/changelogs/ninetyeight_pokemon.sql"/>
   <include file="db/changelogs/filter_pokemon.sql"/>
+  <include file="db/changelogs/fix_alolan.sql"/>
 
 </databaseChangeLog>

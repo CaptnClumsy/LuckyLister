@@ -15,6 +15,7 @@ public class PokemonDao {
 	private boolean shiny;
 	private boolean shadow;
 	private Long costume;
+	private Long variant;
 	private Long region;
 	private Long total;
 
@@ -22,7 +23,7 @@ public class PokemonDao {
 	}
 	
 	public PokemonDao(final Long id, final Long dexid, final String name, boolean lucky,
-		boolean shiny, boolean shadow, Long costume, Long region) {
+		boolean shiny, boolean shadow, Long costume, Long variant, Long region) {
 		this.id=id;
 		this.dexid=dexid;
 		this.name=name;
@@ -31,6 +32,7 @@ public class PokemonDao {
 		this.shiny=shiny;
 		this.shadow=shadow;
 		this.costume=costume;
+		this.variant=variant;
 		this.region=region;
 		this.total=1L;
 	}
@@ -39,7 +41,7 @@ public class PokemonDao {
 		return new PokemonDao(pokemon.getId(), pokemon.getDexid(),
 		    pokemon.getName(), pokemon.getLucky(),
 		    pokemon.getShiny(), pokemon.getShadow(),
-		    pokemon.getCostume(), pokemon.getRegion());
+		    pokemon.getCostume(), pokemon.getVariant(), pokemon.getRegion());
 	}
 
 }

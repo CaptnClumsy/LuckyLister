@@ -40,6 +40,9 @@ public class PokemonEntity {
 	@Column(name = "costume")
 	private Long costume;
 	
+	@Column(name = "variant")
+	private Long variant;
+	
 	@Column(name = "region")
 	private Long region;
 

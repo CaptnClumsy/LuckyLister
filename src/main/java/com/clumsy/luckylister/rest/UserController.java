@@ -123,7 +123,7 @@ public class UserController {
     	}
 		try {
 			UserEntity user = userService.getCurrentUser(principal);
-			List<UserDao> users = userService.getAllUsersWithPokemon(user, pokemonId);
+			List<UserDao> users = userService.getAllUsersWhoNeedPokemon(user, pokemonId);
 			return users;
 		} catch (UserNotFoundException e) {
     		throw new ObjectNotFoundException("Current user not found");
@@ -219,7 +219,7 @@ public class UserController {
 		try {
 			UserEntity user = userService.getCurrentUser(principal);
 			PokemonDao p = pokemonService.getPokemon(pokemonId);
-			List<UserDao> users = userService.getAllUsersWithShinyPokemon(user, p.getDexid());
+			List<UserDao> users = userService.getAllUsersWhoNeedShinyPokemon(user, p.getId());
 			return users;
 		} catch (UserNotFoundException e) {
     		throw new ObjectNotFoundException("Current user not found");
@@ -236,7 +236,7 @@ public class UserController {
 		try {
 			UserEntity user = userService.getCurrentUser(principal);
 			PokemonDao p = pokemonService.getPokemon(pokemonId);
-			List<UserDao> users = userService.getAllUsersWithShadowPokemon(user, p.getId());
+			List<UserDao> users = userService.getAllUsersWhoNeedShadowPokemon(user, p.getId());
 			return users;
 		} catch (UserNotFoundException e) {
     		throw new ObjectNotFoundException("Current user not found");
@@ -253,7 +253,7 @@ public class UserController {
 		try {
 			UserEntity user = userService.getCurrentUser(principal);
 			PokemonDao p = pokemonService.getPokemon(pokemonId);
-			List<UserDao> users = userService.getAllUsersWithHundoPokemon(user, p.getDexid());
+			List<UserDao> users = userService.getAllUsersWhoNeedHundoPokemon(user, p.getId());
 			return users;
 		} catch (UserNotFoundException e) {
     		throw new ObjectNotFoundException("Current user not found");
@@ -332,7 +332,7 @@ public class UserController {
 		try {
 			UserEntity user = userService.getCurrentUser(principal);
 			PokemonDao p = pokemonService.getPokemon(pokemonId);
-			List<UserDao> users = userService.getAllUsersWithNinetyEightPokemon(user, p.getDexid());
+			List<UserDao> users = userService.getAllUsersWhoNeedNinetyEightPokemon(user, p.getId());
 			return users;
 		} catch (UserNotFoundException e) {
     		throw new ObjectNotFoundException("Current user not found");

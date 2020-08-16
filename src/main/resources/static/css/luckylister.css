@@ -76,6 +76,9 @@ body {
 .lucky-filter-icon {
 	padding-right: 16px;
 }
+.lucky-select-icon {
+	padding-right: 16px;
+}
 .lucky-cell-shadow {
 	position: absolute;
     bottom: 14px;
@@ -422,4 +425,23 @@ body {
 }
 .lucky-leader-pane {
 	overflow: auto;
+}
+.select2-container .select2-selection, 
+.select2-selection__rendered, 
+.select2-selection__arrow {
+    height: 58px !important;
+    line-height: 58px !important;
+}
+.lucky-select-item {
+	display: flex;
+	align-items: flex-end;
+	padding-top: 0px;
+	padding-bottom: 0px;
+	line-height: 28px;
+	padding-left: 8px;
+	font-size: 24px;
+}
+.lucky-select-item-text {
+	padding-bottom: 8px;
+	padding-left: 8px;
 }

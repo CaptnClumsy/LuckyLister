@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import com.clumsy.luckylister.entities.LeaderEntity;
 import com.clumsy.luckylister.entities.UserEntity;
-import com.clumsy.luckylister.entities.UserShinyCountEntity;
  
 @Repository
 public interface UserRepo extends JpaRepository<UserEntity, Long> {
@@ -46,20 +45,20 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
 			"ORDER BY t.displayName ASC")
 	List<UserEntity> findAllByPokemonId(Long pokemonId);
 	
-	@Query("SELECT COUNT(*) FROM UserShinyPokemonEntity t, PokemonEntity p WHERE t.userid=?1 AND p.id=t.pokemonid AND p.costume!=0")
+	@Query("SELECT COUNT(*) FROM UserShinyPokemonEntity t, PokemonEntity p WHERE t.userid=?1 AND p.id=t.pokemonid AND p.costume!=0 AND p.shadow=false")
 	Long findShinyCostume(Long userid);
 	@Query("SELECT COUNT(*) FROM UserShinyPokemonEntity t, PokemonEntity p WHERE t.userid=?1 AND p.id=t.pokemonid AND p.shadow=true")
 	Long findShinyShadow(Long userid);
-	@Query("SELECT COUNT(*) FROM UserShinyPokemonEntity t, PokemonEntity p WHERE t.userid=?1 AND p.id=t.pokemonid AND p.region!=0")
+	@Query("SELECT COUNT(*) FROM UserShinyPokemonEntity t, PokemonEntity p WHERE t.userid=?1 AND p.id=t.pokemonid AND p.region!=0 AND p.shadow=false")
 	Long findShinyAlolan(Long userid);
 	@Query("SELECT COUNT(*) FROM UserShinyPokemonEntity t, PokemonEntity p WHERE t.userid=?1 AND p.id=t.pokemonid AND p.costume=0 AND p.shadow=false AND p.region=0")
 	Long findShiny(Long userid);
 	
-	@Query("SELECT COUNT(*) FROM PokemonEntity t WHERE t.shiny=true AND t.costume!=0")
+	@Query("SELECT COUNT(*) FROM PokemonEntity t WHERE t.shiny=true AND t.costume!=0 AND t.shadow=false")
 	Long findShinyCostumeTotal();
 	@Query("SELECT COUNT(*) FROM PokemonEntity t WHERE t.shiny=true AND t.shadow=true")
 	Long findShinyShadowTotal();
-	@Query("SELECT COUNT(*) FROM PokemonEntity t WHERE t.shiny=true AND t.region!=0")
+	@Query("SELECT COUNT(*) FROM PokemonEntity t WHERE t.shiny=true AND t.region!=0 AND t.shadow=false")
 	Long findShinyAlolanTotal();
 	@Query("SELECT COUNT(*) FROM PokemonEntity t WHERE t.shiny=true AND t.costume=0 AND t.shadow=false AND t.region=0")
 	Long findShinyTotal();
@@ -80,9 +79,8 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
 			"GROUP BY u.id ORDER BY total DESC, displayName DESC")
 	List<LeaderEntity> findShadowLeaders();
 	
-	@Query("SELECT l.userid AS id, COUNT(*) AS count FROM UserShinyPokemonEntity l WHERE " +
-			  "l.pokemonid IN (SELECT p.id FROM PokemonEntity p WHERE p.dexid=?1 AND p.shiny=true) GROUP BY l.userid ORDER BY l.userid")
-	List<UserShinyCountEntity> findAllShinyByDexId(Long dexId);
+	@Query("SELECT u FROM UserEntity u WHERE u.id != 0 AND NOT EXISTS (SELECT 'x' FROM UserShinyPokemonEntity l WHERE l.userid=u.id AND l.pokemonid = ?1) ORDER BY u.displayName ASC")
+	List<UserEntity> findAllWhoNeedShinyById(Long id);
 	
 	@Query("SELECT t FROM UserEntity t WHERE t.id != 0 AND " +
 			" t.id NOT IN (" +
@@ -100,20 +98,20 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
 	
 	@Query("SELECT COUNT(*) FROM UserHundoPokemonEntity t, PokemonEntity p WHERE t.userid=?1 AND p.id=t.pokemonid AND p.costume=0 AND p.region=0 AND p.shadow=false")
 	Long findHundo(Long userid);
-	@Query("SELECT COUNT(*) FROM UserHundoPokemonEntity t, PokemonEntity p WHERE t.userid=?1 AND p.id=t.pokemonid AND p.costume!=0")
+	@Query("SELECT COUNT(*) FROM UserHundoPokemonEntity t, PokemonEntity p WHERE t.userid=?1 AND p.id=t.pokemonid AND p.costume!=0 AND p.shadow=false")
 	Long findHundoCostume(Long userid);
 	@Query("SELECT COUNT(*) FROM UserHundoPokemonEntity t, PokemonEntity p WHERE t.userid=?1 AND p.id=t.pokemonid AND p.shadow=true")
 	Long findHundoShadow(Long userid);
-	@Query("SELECT COUNT(*) FROM UserHundoPokemonEntity t, PokemonEntity p WHERE t.userid=?1 AND p.id=t.pokemonid AND p.region!=0")
+	@Query("SELECT COUNT(*) FROM UserHundoPokemonEntity t, PokemonEntity p WHERE t.userid=?1 AND p.id=t.pokemonid AND p.region!=0 AND p.shadow=false")
 	Long findHundoAlolan(Long userid);
 	
 	@Query("SELECT COUNT(*) FROM PokemonEntity t WHERE t.shiny=false AND t.region=0 AND t.costume=0 AND t.shadow=false")
 	Long findHundoTotal();
-	@Query("SELECT COUNT(*) FROM PokemonEntity t WHERE t.shiny=false AND t.costume!=0")
+	@Query("SELECT COUNT(*) FROM PokemonEntity t WHERE t.shiny=false AND t.costume!=0 AND t.shadow=false")
 	Long findHundoCostumeTotal();
 	@Query("SELECT COUNT(*) FROM PokemonEntity t WHERE t.shiny=false AND t.shadow=true")
 	Long findHundoShadowTotal();
-	@Query("SELECT COUNT(*) FROM PokemonEntity t WHERE t.shiny=false AND t.region!=0")
+	@Query("SELECT COUNT(*) FROM PokemonEntity t WHERE t.shiny=false AND t.region!=0 AND t.shadow=false")
 	Long findHundoAlolanTotal();
 	
 	@Query("SELECT u.id AS id, u.displayName AS displayName, COUNT(*) AS total " +
@@ -128,11 +126,11 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
 
 	@Query("SELECT SUM(t.total) FROM UserHundoPokemonEntity t, PokemonEntity p WHERE t.userid=?1 AND p.id=t.pokemonid AND p.region=0 AND p.costume=0 AND p.shadow=false")
 	Long findHundoCount(Long userid);
-	@Query("SELECT SUM(t.total) FROM UserHundoPokemonEntity t, PokemonEntity p WHERE t.userid=?1 AND p.id=t.pokemonid AND p.costume!=0")
+	@Query("SELECT SUM(t.total) FROM UserHundoPokemonEntity t, PokemonEntity p WHERE t.userid=?1 AND p.id=t.pokemonid AND p.costume!=0 AND p.shadow=false")
 	Long findHundoCostumeCount(Long userid);
 	@Query("SELECT SUM(t.total) FROM UserHundoPokemonEntity t, PokemonEntity p WHERE t.userid=?1 AND p.id=t.pokemonid AND p.shadow=true")
 	Long findHundoShadowCount(Long userid);
-	@Query("SELECT SUM(t.total) FROM UserHundoPokemonEntity t, PokemonEntity p WHERE t.userid=?1 AND p.id=t.pokemonid AND p.region!=0")
+	@Query("SELECT SUM(t.total) FROM UserHundoPokemonEntity t, PokemonEntity p WHERE t.userid=?1 AND p.id=t.pokemonid AND p.region!=0 AND p.shadow=false")
 	Long findHundoAlolanCount(Long userid);
 
 	

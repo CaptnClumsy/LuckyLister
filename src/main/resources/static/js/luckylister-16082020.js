@@ -9,7 +9,6 @@ var filter = {
   shadows: true,
   alolan: true,
   other: true
-  
 };
 var key_timeout = null;
 
@@ -341,21 +340,24 @@ function showUserPokemon(id) {
 	var str = "";
 	if (data.length!=0) {
 	  for (var i=0; i<data.length; i++) {
-		if (!filter.costumes && data[i].costume!==0) {
-	      continue;
-	    }
+		if (!filter.other && data[i].costume==0 && data[i].shadow==false && data[i].region==0) {
+		  continue;
+		}
 		if (!filter.shadows && data[i].shadow!==false) {
 		  continue;
 		}
-		if (!filter.alolan && data[i].region!==0) {
-		  continue;
-	    }
-		if (!filter.other && data[i].costume==0 && data[i].shadow==false && data[i].region==0) {
-	      continue;
-	    }
-	    str += "<div class=\"lucky-pokemon-cell\" id=\"user-pokemon-" + data[i].id + "\">";
-	    str += getCellHtml(data[i], width, false);
-	    str += "</div>\n";
+		var add = false;
+	  	if (filter.costumes && data[i].costume!==0)
+	  	  add = true;
+	  	else if (filter.alolan && (data[i].region!==0 && data[i].costume==0))
+	  	  add = true;
+	  	else if (filter.other && (data[i].region==0 && data[i].costume==0))
+	  	  add = true;
+	  	if (add) {
+		  str += "<div class=\"lucky-pokemon-cell\" id=\"user-pokemon-" + data[i].id + "\">";
+	      str += getCellHtml(data[i], width, false);
+	      str += "</div>\n";
+	  	}
 	  }
     } else {
 		str="<div class=\"jumbotron lucky-professor-jumbo\">" +
@@ -379,16 +381,10 @@ function initPokemon() {
 	    width: '90%',
 	    data: data,
 	    templateResult: function(data) {
-	      var iconClass = "fas fa-splotch";
-	      if (data.costume!==undefined && data.costume!=0) {
-	    	  iconClass = "fab fa-redhat";
-	      } else if (data.shadow!==undefined && data.shadow==true) {
-	          iconClass = "fab fa-gripfire";
-	      } else if (data.region!==undefined && data.region!=0) {
-	    	  iconClass = "fas fa-globe-europe";
-	      }
-	      var element = $("<button class=\"dropdown-item lucky-filter-item\"><i class=\"lucky-filter-icon "+iconClass+"\"></i>"+data.text+"</button>");
-	      return element;
+	      return formatPokemonForSelection(data, false);
+	    },
+	    templateSelection: function(data) {
+	      return formatPokemonResult(data);
 	    }
 	  });
 	  $('#question-search').on("select2:select", function(e) {
@@ -400,6 +396,40 @@ function initPokemon() {
 	  errorPage("Failed to query pokemon data", result);
 	}
   });
+}
+
+function formatPokemonResult(data) {
+	if (!data.id) {
+        return data.text.trim();
+    }
+	return formatPokemonForSelection(data, true);
+}
+
+function formatPokemonForSelection(data, result) {
+	var iconClass = "fas fa-splotch";
+    if (data.costume!==undefined && data.costume!=0) {
+  	  iconClass = "fab fa-redhat";
+    } else if (data.shadow!==undefined && data.shadow==true) {
+      iconClass = "fab fa-gripfire";
+    } else if (data.region!==undefined && data.region!=0) {
+  	  iconClass = "fas fa-globe-europe";
+    }
+    var pokemondata = {
+  	dexid: data.dexid,
+  	costume: data.costume,
+  	variant: data.variant,
+  	region: data.region,
+  	shadow: data.shadow,
+  	shiny: data.shiny,
+  	done: true
+    };
+    var btnClass = "lucky-select-item";
+    var image_url = getImageUrl(pokemondata);
+    var element = $("<button class=\"dropdown-item "+btnClass+"\">" + 
+  		  "<img src=\"" + image_url + "\" height=\"52px\"></img>" +
+  		  "<div class=\"lucky-select-item-text\">" +
+  		  "<i class=\"lucky-select-icon "+iconClass+"\"></i>"+data.text+"</div></button>");
+    return element;
 }
 
 function showPokemonPage() {
@@ -439,21 +469,24 @@ function showHome() {
     $("#pokemon").html("");
     var str = "";
     for (var i=0; i<data.length; i++) {
-      if (!filter.costumes && data[i].costume!==0) {
-    	  continue;
-      }
-      if (!filter.shadows && data[i].shadow!==false) {
-		  continue;
-	  }
-      if (!filter.alolan && data[i].region!==0) {
-		  continue;
-	  }
       if (!filter.other && data[i].costume==0 && data[i].shadow==false && data[i].region==0) {
-    	  continue;
-      }
-      str += "<div class=\"lucky-pokemon-cell\" id=\"pokemon-" + data[i].id + "\">";
-      str += getCellHtml(data[i], width, true);
-      str += "</div>\n";
+  		continue;
+  	  }
+  	  if (!filter.shadows && data[i].shadow!==false) {
+  		continue;
+  	  }
+  	  var add = false;
+  	  if (filter.costumes && data[i].costume!==0)
+  		  add = true;
+  	  else if (filter.alolan && (data[i].region!==0 && data[i].costume==0))
+  		  add = true;
+  	  else if (filter.other && (data[i].region==0 && data[i].costume==0))
+  		  add = true;
+  	  if (add) {
+        str += "<div class=\"lucky-pokemon-cell\" id=\"pokemon-" + data[i].id + "\">";
+        str += getCellHtml(data[i], width, true);
+        str += "</div>\n";
+  	  }
     }
     $("#pokemon").html(str);
     searchPokemon();
@@ -514,7 +547,7 @@ function getCellHtml(data, width, select) {
 	if (data.done!==true) {
 	  str += "_d";
 	}
-	str += ".png\"></img>";	  
+	str += ".png\" width=\"" + Math.round(width / 2.3) + "\"></img>";	  
   }
   var image_url = getImageUrl(data);
   str += "<img src=\"" + image_url + "\" ";
@@ -567,19 +600,19 @@ function padNumber2(val) {
 	
 function getImageUrl(data) {
   var iconId = padNumber3(data.dexid);
-  var regionId = padNumber2(data.region);
+  var variantId = padNumber2(data.variant);
   var costumeId = padNumber2(data.costume);
   var image_url = "";
-  if (page_mode=="shiny") {
+  if (page_mode=="shiny" || (data.shiny!==undefined && data.shiny===true)) {
     image_url = "images/shiny/";
   } else {
 	image_url = "images/";
   }
-  image_url += "pokemon_icon_" + iconId + "_" + regionId;
+  image_url += "pokemon_icon_" + iconId + "_" + variantId;
   if (costumeId!="00") {
 	  image_url += "_" + costumeId;
   }
-  if (page_mode=="shiny") {
+  if (page_mode=="shiny" || (data.shiny!==undefined && data.shiny===true)) {
 	  image_url += "_shiny";
   }
   if (data.done!==true) {

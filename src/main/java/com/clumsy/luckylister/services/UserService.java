@@ -5,10 +5,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,12 +23,10 @@ import com.clumsy.luckylister.entities.FilterEntity;
 import com.clumsy.luckylister.entities.FriendEntity;
 import com.clumsy.luckylister.entities.LeaderEntity;
 import com.clumsy.luckylister.entities.UserEntity;
-import com.clumsy.luckylister.entities.UserShinyCountEntity;
 import com.clumsy.luckylister.exceptions.UserAlreadyRegisteredException;
 import com.clumsy.luckylister.exceptions.UserNotFoundException;
 import com.clumsy.luckylister.repos.FilterRepo;
 import com.clumsy.luckylister.repos.FriendRepo;
-import com.clumsy.luckylister.repos.PokemonRepo;
 import com.clumsy.luckylister.repos.UserRepo;
 
 @Service
@@ -40,15 +36,13 @@ public class UserService {
 
 	private final UserRepo userRepo;
 	private final FriendRepo friendRepo;
-	private final PokemonRepo pokemonRepo;
 	private final FilterRepo filterRepo;
 	
 	@Autowired
 	UserService(final UserRepo userRepo, final FriendRepo friendRepo,
-			final PokemonRepo pokemonRepo, final FilterRepo filterRepo) {
+			final FilterRepo filterRepo) {
 		this.userRepo = userRepo;
 		this.friendRepo = friendRepo;
-		this.pokemonRepo = pokemonRepo;
 		this.filterRepo = filterRepo;
 	}
 	
@@ -178,7 +172,7 @@ public class UserService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<UserDao> getAllUsersWithPokemon(UserEntity user, Long pokemonId) {
+	public List<UserDao> getAllUsersWhoNeedPokemon(UserEntity user, Long pokemonId) {
 		final List<UserEntity> users = userRepo.findAllByPokemonId(pokemonId);
 		if (users == null) {
 			return Collections.emptyList();
@@ -300,32 +294,13 @@ public class UserService {
 	}
 	
 	@Transactional(readOnly = true)
-	public List<UserDao> getAllUsersWithShinyPokemon(UserEntity user, Long dexId) {
-		// Find how many pokemon have this dex id
-		final Integer count = pokemonRepo.countAllShinyByDexId(dexId);
-		// Find all users
-		final List<UserEntity> allUsers = userRepo.findAll();
-		final List<UserEntity> allUsersWithout = new ArrayList<>();
-		// Find who has got this shiny and how many of them
-		final List<UserShinyCountEntity> userCountEntities = userRepo.findAllShinyByDexId(dexId);
-		final Map<Long, Integer> userCounts = userCountEntities.stream().collect(
-                Collectors.toMap(UserShinyCountEntity::getId, UserShinyCountEntity::getCount));
-		if (userCounts != null) {
-			for (UserEntity thisUser : allUsers) {
-				if (!userCounts.containsKey(thisUser.getId())) {
-					allUsersWithout.add(thisUser);
-				} else if (userCounts.get(thisUser.getId())!=count) {
-					allUsersWithout.add(thisUser);
-				}
-			}
-		} else {
-			// Everybody needs them
-			allUsersWithout.addAll(allUsers);
-		}
+	public List<UserDao> getAllUsersWhoNeedShinyPokemon(UserEntity user, Long id) {
+		// Find who has not got this shiny
+		final List<UserEntity> users = userRepo.findAllWhoNeedShinyById(id);
 		// Build list of User data objects
 		final Set<Long> allFriends = friendRepo.findAllByUser(user.getId());
-		List<UserDao> userDaos = new ArrayList<>(userCounts.size());
-		for (UserEntity thisUser : allUsersWithout) {
+		List<UserDao> userDaos = new ArrayList<>(users.size());
+		for (UserEntity thisUser : users) {
 			UserDao userDao = UserDao.fromEntity(thisUser);
 			if (allFriends!=null && allFriends.contains(thisUser.getId())) {
 				userDao.setFriends(true);
@@ -342,7 +317,7 @@ public class UserService {
 	}
 	
 	@Transactional(readOnly = true)
-	public List<UserDao> getAllUsersWithShadowPokemon(UserEntity user, Long pokemonId) {
+	public List<UserDao> getAllUsersWhoNeedShadowPokemon(UserEntity user, Long pokemonId) {
 		final List<UserEntity> users = userRepo.findAllShadowByPokemonId(pokemonId);
 		if (users == null) {
 			return Collections.emptyList();
@@ -400,7 +375,7 @@ public class UserService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<UserDao> getAllUsersWithHundoPokemon(UserEntity user, Long pokemonId) {
+	public List<UserDao> getAllUsersWhoNeedHundoPokemon(UserEntity user, Long pokemonId) {
 		final List<UserEntity> users = userRepo.findAllHundoByPokemonId(pokemonId);
 		if (users == null) {
 			return Collections.emptyList();
@@ -487,7 +462,7 @@ public class UserService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<UserDao> getAllUsersWithNinetyEightPokemon(UserEntity user, Long pokemonId) {
+	public List<UserDao> getAllUsersWhoNeedNinetyEightPokemon(UserEntity user, Long pokemonId) {
 		final List<UserEntity> users = userRepo.findAllNinetyEightByPokemonId(pokemonId);
 		if (users == null) {
 			return Collections.emptyList();
