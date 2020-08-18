@@ -27,6 +27,7 @@ body {
 .lucky-left-nav {
 	display: flex;
 	align-items: center;
+	margin-bottom: 6px;
 }
 .lucky-navbar-title {
     font-size: 20px;
@@ -444,4 +445,11 @@ body {
 .lucky-select-item-text {
 	padding-bottom: 8px;
 	padding-left: 8px;
+}
+.lucky-filter-menu {
+	min-width: 100px;
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: absolute !important;
 }
